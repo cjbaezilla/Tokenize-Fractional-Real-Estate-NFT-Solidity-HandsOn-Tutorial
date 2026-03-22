@@ -1,0 +1,8 @@
+.vscode/
+.opencode
+opencode.json
+AGENTS.md
+.env
+package-lock.json
+node_modules/
+deployments/
