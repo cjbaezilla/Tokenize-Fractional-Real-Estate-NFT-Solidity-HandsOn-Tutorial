@@ -19,6 +19,7 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
     string private _propertyType;
     string private _description;
     string private _imageData;
+    string private _externalUrl;
 
     constructor(
         address initialOwner,
@@ -46,13 +47,15 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
         uint256 propertyValue,
         string memory propertyType,
         string memory description,
-        string memory imageData
+        string memory imageData,
+        string memory externalUrl
     ) public onlyOwner {
         _propertyAddress = propertyAddress;
         _propertyValue = propertyValue;
         _propertyType = propertyType;
         _description = description;
         _imageData = imageData;
+        _externalUrl = externalUrl;
     }
 
     function updatePropertyAddress(string memory propertyAddress) public onlyOwner {
@@ -75,6 +78,10 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
         _imageData = imageData;
     }
 
+    function updateExternalUrl(string memory externalUrl) public onlyOwner {
+        _externalUrl = externalUrl;
+    }
+
     function setMintPrice(uint256 _mintPrice) public onlyOwner {
         mint_price = _mintPrice;
     }
@@ -89,11 +96,13 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
             _description, 
             '", "image": "', 
             _imageData, 
-            '", "properties": {',
-            '"address": "', _propertyAddress, '",',
-            '"value": ', Strings.toString(_propertyValue), ',',
-            '"type": "', _propertyType, '"',
-            '}}'
+            '", "external_url": "',
+            _externalUrl,
+            '", "attributes": [',
+            '{"trait_type": "Property Type", "value": "', _propertyType, '"},',
+            '{"trait_type": "Property Value", "value": ', Strings.toString(_propertyValue), '},',
+            '{"trait_type": "Property Address", "value": "', _propertyAddress, '"}',
+            ']}'
         ));
         
         return json;
@@ -117,5 +126,9 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
 
     function getImageData() public view returns (string memory) {
         return _imageData;
+    }
+
+    function getExternalUrl() public view returns (string memory) {
+        return _externalUrl;
     }
 }
