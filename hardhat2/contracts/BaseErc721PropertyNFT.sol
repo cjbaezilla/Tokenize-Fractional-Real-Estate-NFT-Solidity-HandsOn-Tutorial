@@ -11,12 +11,14 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
     uint256 public immutable maxSupply;
     
     // Price in wei considering 6 decimals for USDT (1 USDT = 1e6)
-    uint256 public mint_price; 
+    uint256 public mintPrice; 
     
     // Individual property metadata storage
     string private _propertyAddress;
     uint256 private _propertyValue;
     string private _propertyType;
+    uint256 private _propertyRooms;
+    uint256 private _propertyBaths;
     string private _description;
     string private _imageData;
     string private _externalUrl;
@@ -32,7 +34,7 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
         Ownable(initialOwner)
     {
         maxSupply = _maxSupply;
-        mint_price = _mintPrice;
+        mintPrice = _mintPrice;
     }
 
     function safeMint(address to) public onlyOwner returns (uint256) {
@@ -46,6 +48,8 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
         string memory propertyAddress,
         uint256 propertyValue,
         string memory propertyType,
+        uint256 propertyRooms,
+        uint256 propertyBaths,
         string memory description,
         string memory imageData,
         string memory externalUrl
@@ -53,6 +57,8 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
         _propertyAddress = propertyAddress;
         _propertyValue = propertyValue;
         _propertyType = propertyType;
+        _propertyRooms = propertyRooms;
+        _propertyBaths = propertyBaths;
         _description = description;
         _imageData = imageData;
         _externalUrl = externalUrl;
@@ -70,6 +76,14 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
         _propertyType = propertyType;
     }
 
+    function updatePropertyRooms(uint256 propertyRooms) public onlyOwner {
+        _propertyRooms = propertyRooms;
+    }
+
+    function updatePropertyBaths(uint256 propertyBaths) public onlyOwner {
+        _propertyBaths = propertyBaths;
+    }
+
     function updateDescription(string memory description) public onlyOwner {
         _description = description;
     }
@@ -83,7 +97,7 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
     }
 
     function setMintPrice(uint256 _mintPrice) public onlyOwner {
-        mint_price = _mintPrice;
+        mintPrice = _mintPrice;
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
@@ -99,9 +113,11 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
             '", "external_url": "',
             _externalUrl,
             '", "attributes": [',
-            '{"trait_type": "Property Type", "value": "', _propertyType, '"},',
-            '{"trait_type": "Property Value", "value": ', Strings.toString(_propertyValue), '},',
-            '{"trait_type": "Property Address", "value": "', _propertyAddress, '"}',
+            '{"trait_type": "Type", "value": "', _propertyType, '"},',
+            '{"trait_type": "Value", "value": ', Strings.toString(_propertyValue), '},',
+            '{"trait_type": "Address", "value": "', _propertyAddress, '"},',
+            '{"trait_type": "Rooms", "value": ', Strings.toString(_propertyRooms), '},',
+            '{"trait_type": "Bathrooms", "value": ', Strings.toString(_propertyBaths), '}',
             ']}'
         ));
         
@@ -118,6 +134,14 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
 
     function getPropertyType() public view returns (string memory) {
         return _propertyType;
+    }
+
+    function getPropertyRooms() public view returns (uint256) {
+        return _propertyRooms;
+    }
+
+    function getPropertyBaths() public view returns (uint256) {
+        return _propertyBaths;
     }
 
     function getDescription() public view returns (string memory) {
