@@ -744,6 +744,251 @@ NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your-project-id-here
 
 Update the `wagmi.ts` file to use this environment variable for the projectId setting.
 
+#### Understanding TypeChain for Type Safety
+
+Your frontend TypeScript code interacts with the deployed smart contracts through their Application Binary Interfaces, or ABIs. The ABI defines the functions, parameters, and return types that your application can call. Without type safety, developers must manually write these interfaces as JavaScript objects, risking mismatched parameter names, incorrect types, or missing functions that cause runtime errors when transactions fail.
+
+TypeChain automates this process by generating TypeScript type definitions directly from your Solidity contracts. When you run ```npx hardhat compile```, the TypeChain plugin reads the compiled artifacts, extracts the ABI and function signatures, and produces strongly-typed contract classes in the typechain-types directory. These generated classes provide compile-time checking: if you attempt to call a function that does not exist or pass a string where a number is expected, TypeScript flags the error before the code ever reaches the browser.
+
+The hardhat.config.js file includes TypeChain configuration pointing to the typechain-types output directory and targeting ethers-v6, which matches the ethers version used in your frontend. After compilation, you can import your contracts like any TypeScript module:
+
+```typescript
+import { BaseErc721PropertyNFT } from "../typechain-types";
+import { MockUSDT } from "../typechain-types";
+```
+
+The generated BaseErc721PropertyNFT class includes all contract functions as methods with correctly typed parameters and return values. For instance, the purchase function appears as:
+
+```typescript
+purchase(): Promise<ContractTransaction>;
+```
+
+TypeScript knows this function takes no arguments and returns a Promise of ContractTransaction, preventing accidental parameter passing. Similarly, read functions like tokenURI have matching signatures:
+
+```typescript
+tokenURI(tokenId: BigNumberish): Promise<string>;
+```
+
+The tokenId parameter requires a BigNumberish type (bigint, number, or string representation), and the function returns a Promise resolving to the metadata JSON string. This eliminates entire classes of bugs where developers might pass the wrong data type or forget to await a promise.
+
+Whenever you modify your Solidity contracts, you must recompile to update the TypeChain types. The compilation process overwrites the typechain-types directory with fresh definitions matching your current contract code. Your frontend imports automatically reference the updated types on the next build. This tight coupling between contract changes and frontend type safety ensures your entire application remains consistent as the smart contract evolves.
+
+TypeChain also generates contract factories for deployment, though your project uses Hardhat Ignition for deployment scripts. The factories remain useful for testing and potential programmatic deployments outside Ignition. The combination of TypeScript and TypeChain creates a type-safe full-stack development experience rarely seen in blockchain applications, significantly reducing development friction and runtime failures.
+
+### Hardhat Configuration with TypeChain
+
+The current `hardhat.config.js` uses `@nomicfoundation/hardhat-toolbox`, which includes TypeChain with default settings. However, to generate types compatible with ethers.js v6 (required by wagmi/viem), you must add explicit TypeChain configuration. The article mentions this but the actual config file lacks it.
+
+Update your `hardhat.config.js` to include the TypeChain plugin and configuration:
+
+```javascript
+require("dotenv").config();
+require("@nomicfoundation/hardhat-toolbox");
+require("@typechain/hardhat");
+
+/** @type import('hardhat/config').HardhatUserConfig */
+module.exports = {
+  solidity: {
+    version: "0.8.28",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+      viaIR: true,
+      evmVersion: "cancun",
+    },
+  },
+  typechain: {
+    outDir: "typechain-types",
+    target: "ethers-v6",
+    alwaysGenerateOverloads: true,
+    discardExternalAndInternalErrors: true,
+  },
+  networks: {
+    localhost: {
+      url: "http://127.0.0.1:8545",
+    },
+    sepolia: {
+      url: process.env.SEPOLIA_RPC_URL || "",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+};
+```
+
+**TypeChain Configuration Options**
+
+| Option | Default | Recommended | Purpose |
+|--------|---------|-------------|---------|
+| `outDir` | `typechain-types` | `typechain-types` | Output directory for generated TypeScript types |
+| `target` | N/A (required) | `ethers-v6` | Generates types compatible with ethers.js v6 |
+| `alwaysGenerateOverloads` | `false` | `true` | Creates function overloads for better type inference |
+| `discardExternalAndInternalErrors` | `false` | `true` | Simplifies error types in TypeScript |
+
+After updating the config, regenerate types:
+
+```bash
+cd hardhat2
+npx hardhat compile
+```
+
+Check that `typechain-types/` contains `BaseErc721PropertyNFT.ts` and `MockUSDT.ts` with properly typed method signatures.
+
+### Deployment Scripts with Hardhat Ignition
+
+The article references Hardhat Ignition but doesn't show the actual deployment modules. Hardhat Ignition provides a declarative deployment system that tracks deployed contracts and their relationships. The project includes two modules:
+
+#### BaseErc721PropertyNFT Module
+
+File: `hardhat2/ignition/modules/BaseErc721PropertyNFT.ts`
+
+```typescript
+import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+
+const BaseErc721PropertyNFTModule = buildModule("BaseErc721PropertyNFTModule", (m) => {
+  // Deployment parameters with defaults
+  const initialOwner = m.getParameter("initialOwner", "0xaEeaA55ED4f7df9E4C5688011cEd1E2A1b696772");
+  const name = m.getParameter("name", "Luxury 3-Bedroom Apartment: 123 Main St, City, Country");
+  const ticker = m.getParameter("ticker", "123-Main-St-City-Country");
+  const maxSupply = m.getParameter("maxSupply", 1000n);
+  const mintPrice = m.getParameter("mintPrice", 1000000n); // 1 USDT (6 decimals)
+  const usdtToken = m.getParameter("usdtToken", "0x18648D890d389438a12962965E5c47d9C667B20c");
+
+  // Property metadata parameters
+  const propertyAddress = m.getParameter("propertyAddress", "123 Main St, City, Country");
+  const propertyValue = m.getParameter("propertyValue", 500000n);
+  const propertyType = m.getParameter("propertyType", "Apartment");
+  const propertyRooms = m.getParameter("propertyRooms", 3n);
+  const propertyBaths = m.getParameter("propertyBaths", 2n);
+  const description = m.getParameter("description", "This premium fractionalized apartment represents a smart real estate investment opportunity. Own a share of this beautifully renovated 3-bedroom, 2-bathroom apartment in the heart of downtown. The property features modern finishes, floor-to-ceiling windows, and premium amenities including a rooftop pool and 24/7 concierge.");
+  const imageData = m.getParameter("imageData", "https://ipfs.io/ipfs/bafybeiceq4fw66eswi34axd6423kqawmurkwjg7haotwmar7r4luzobeem");
+  const externalUrl = m.getParameter("externalUrl", "https://baeza.me");
+
+  // Deploy the contract
+  const baseErc721PropertyNFT = m.contract("BaseErc721PropertyNFT", [
+    initialOwner,
+    name,
+    ticker,
+    maxSupply,
+    mintPrice,
+    usdtToken
+  ]);
+
+  // Update property metadata after deployment
+  m.call(baseErc721PropertyNFT, "updatePropertyMetadata", [
+    propertyAddress,
+    propertyValue,
+    propertyType,
+    propertyRooms,
+    propertyBaths,
+    description,
+    imageData,
+    externalUrl
+  ]);
+
+  return { baseErc721PropertyNFT };
+});
+
+export default BaseErc721PropertyNFTModule;
+```
+
+**Architecture Patterns**
+
+| Pattern | Code | Why |
+|---------|------|-----|
+| Parameterization | `m.getParameter("maxSupply", 1000n)` | Enables customization per deployment |
+| Constructor separation | Core args in `m.contract()`, metadata in `m.call()` | Keeps immutable and mutable configuration separate |
+| Return exports | `return { baseErc721PropertyNFT }` | Allows dependent modules to reference this contract |
+
+#### MockUSDT Module
+
+File: `hardhat2/ignition/modules/MockUSDT.ts`
+
+```typescript
+import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+
+const MockUSDTModule = buildModule("MockUSDTModule", (m) => {
+  const initialOwner = m.getParameter("initialOwner", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266");
+
+  const mockUSDT = m.contract("MockUSDT", [initialOwner]);
+
+  // Mint initial supply to owner for testing
+  m.call(mockUSDT, "mint", [initialOwner, 1000000n * 10n ** 6n]);
+
+  return { mockUSDT };
+});
+
+export default MockUSDTModule;
+```
+
+### Deployment Workflow
+
+**Step 1: Start local node**
+
+```bash
+cd hardhat2
+npx hardhat node
+```
+
+This spawns a local Ethereum network at `http://127.0.0.1:8545` with unlocked test accounts.
+
+**Step 2: Deploy Mock USDT first**
+
+```bash
+npx hardhat ignition:deploy ./ignition/modules/MockUSDT.ts --network localhost
+```
+
+Copy the deployed address from terminal output.
+
+**Step 3: Deploy NFT contract**
+
+```bash
+npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts \
+  --network localhost \
+  --init-params '{"usdtToken":"0xYourMockUSDTAddress"}'
+```
+
+Replace `0xYourMockUSDTAddress` with the address from Step 2. You can also override other parameters like `maxSupply` or `mintPrice`.
+
+**Step 4: Record addresses**
+
+Deployments write to `hardhat2/ignition/deployments/chain-31337/deployed_addresses.json`:
+
+```json
+{
+  "BaseErc721PropertyNFTModule": {
+    "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "module": "BaseErc721PropertyNFTModule"
+  }
+}
+```
+
+Update your frontend `.env.local` with these addresses:
+
+```env
+NEXT_PUBLIC_PROPERTY_NFT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+NEXT_PUBLIC_MOCK_USDT_ADDRESS=0xYourMockUSDTAddress
+```
+
+#### Overriding Parameters
+
+You can provide any parameter via `--init-params` as a JSON string. Parameters not provided fall back to the defaults in the module:
+
+```bash
+npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts \
+  --network sepolia \
+  --init-params '{
+    "initialOwner":"0xYourWalletAddress",
+    "maxSupply":500,
+    "mintPrice":2000000,
+    "usdtToken":"0xRealUSDTOnSepolia"
+  }'
+```
+
 ### Starting the Frontend
 
 Run the development server:
@@ -816,6 +1061,27 @@ npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --networ
 ```
 
 Take note of the deployed addresses and update your frontend `.env.local` to point to Sepolia contracts. You can then deploy the frontend to Vercel or any hosting service to make it publicly accessible.
+
+### Verifying Your Contract on Etherscan
+
+Deploying your contract to Sepolia testnet creates a live, functional system, but users and auditors cannot examine your code without verification. Etherscan verification publishes your Solidity source code alongside the deployed bytecode, enabling anyone to read exactly what logic governs your token. This transparency builds trust, allows third-party security assessments, and lets users interact directly through Etherscan's interface without needing your frontend.
+
+The verification process uses the Hardhat verify plugin, which you configured in hardhat.config.js under the etherscan key with your API key. Before verifying, ensure your .env file contains a valid Etherscan API key from etherscan.io/apis. The verification command requires the deployed contract address followed by the exact constructor arguments used during deployment.
+
+Recall that BaseErc721PropertyNFT requires six constructor parameters: initialOwner address, name string, ticker string, maxSupply uint256, mintPrice uint256, and usdtToken address. These must be provided in the same order and format as the deployment. For the mock USDT token deployed in step one, you would verify separately with its own constructor arguments (initialOwner address only).
+
+The verification command takes this form:
+
+```bash
+npx hardhat verify --network sepolia <USDT_CONTRACT_ADDRESS> <initialOwner>
+npx hardhat verify --network sepolia <NFT_CONTRACT_ADDRESS> <initialOwner> "<name>" "<ticker>" <maxSupply> <mintPrice> <usdtTokenAddress>
+```
+
+Replace the placeholders with your actual deployed values. For string arguments, wrap them in double quotes. For numeric values, provide them without quotes. The initialOwner should match the address you used to deploy, typically the same address whose private key resides in your .env file.
+
+When executed successfully, the plugin submits your source code to Etherscan, which compiles it and confirms the resulting bytecode matches what is deployed on-chain. Etherscan then displays a green checkmark next to the contract address and shows the verified source code in the "Contract" tab. This verification enables users to read every line of your smart contract directly on the block explorer, an essential feature for any deployed system handling real value.
+
+If you update your contract code and redeploy, you must verify the new deployment separately. The verification process does not affect contract functionality; it merely publishes the code for public inspection. For production deployments on Ethereum mainnet, verification is considered mandatory. On testnets it remains optional but highly recommended for educational projects to demonstrate proper procedures.
 
 ## Understanding the Payment Flow in Depth
 
