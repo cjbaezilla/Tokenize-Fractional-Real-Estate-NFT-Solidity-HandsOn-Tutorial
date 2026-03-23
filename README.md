@@ -48,6 +48,27 @@ This repository contains **two integrated tutorial modules** that work together 
 - Responsive CSS with modern design
 - Environment configuration for dApps
 
+## 🎯 Purchase Lifecycle
+
+The purchase process for fractional real estate tokens involves the following steps:
+
+1. **Approve USDT Token**
+   Users must first approve the contract to spend their USDT tokens. Click the "Approve USDT" button in your wallet interface to authorize the spending.
+   ![Approving USDT for purchase](./images/screenshot_approving_purchase.png)
+
+2. **Purchase Tokens**
+   After approval, click the "Purchase" button to buy fractional tokens. The contract will transfer the required USDT and mint the NFT directly to your wallet.
+   ![Purchasing tokens](./images/screenshot_purchasing.png)
+
+3. **View Minted Tokens**
+   Once the transaction is confirmed, the newly minted NFT will appear in your wallet under the "NFTs" tab, representing your fractional ownership.
+   ![Minted tokens in wallet](./images/screenshot_final_minted_tokens.png)
+
+4. **Transaction Details**
+   View the complete transaction details and confirmations on the block explorer for full transparency.
+   ![Transaction details](./images/purchase_transaction.png)
+   [View on Sepolia Etherscan](https://sepolia.etherscan.io/tx/0x83e90fca156ee8bf93fddc33a4dcbce9eda83d36f1ce6ea5c97d38ac1bd2400e)
+
 ## 📋 Overview
 
 This project implements a system where real estate properties are represented as NFTs (ERC721) that can be purchased using USDT, which can then be divided into fractional shares (tokens) that represent ownership stakes. This enables:
@@ -210,26 +231,6 @@ Tokenize-Fractional-Real-Estate-NFT-Solidity-HandsOn-Tutorial/
 ├── opencode.json               # OpenCode configuration
 ├── README.md                   # This file - tutorial overview
 └── LICENSE                     # MIT License
-```
-.
-├── hardhat2/            # Smart contracts and Hardhat setup
-│   ├── contracts/          # Solidity smart contracts
-│   │   ├── BaseErc721PropertyNFT.sol
-│   │   └── MockUSDT.sol
-│   ├── ignition/           # Hardhat Ignition deployment modules
-│   │   └── modules/
-│   │       └── BaseErc721PropertyNFT.ts
-│   ├── test/               # Test files
-│   │   └── BaseErc721PropertyNFT.test.js
-│   ├── .env.example        # Environment variables template
-│   ├── hardhat.config.js   # Hardhat configuration
-│   └── package.json        # Dependencies
-└── nextjs/             # Front-end React application (Next.js)
-    ├── src/               # Application source code
-    ├── next.config.js     # Next.js configuration
-    ├── package.json       # Dependencies
-    ├── tsconfig.json      # TypeScript configuration
-    └── README.md          # Frontend documentation
 ```
 
 ## 🔍 Contract Workflow

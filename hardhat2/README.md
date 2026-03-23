@@ -1629,7 +1629,7 @@ These are example deployments for the tutorial. Deploy your own to different add
   - Mint Price: 1 USDT (1000000 with 6 decimals)
   - USDT Token: 0x18648D890d389438a12962965E5c47d9C667B20c
 
-## 📸 Demo
+## 📸 Demo Image NFT
 
 ![Fractional Real Estate NFT Demo](https://ipfs.io/ipfs/bafybeiceq4fw66eswi34axd6423kqawmurkwjg7haotwmar7r4luzobeem)
 
