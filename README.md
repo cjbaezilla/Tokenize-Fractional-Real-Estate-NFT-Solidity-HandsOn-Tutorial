@@ -6,37 +6,33 @@ A decentralized application (dApp) for tokenizing real estate properties into fr
 
 ## 📋 Overview
 
-This project implements a system where real estate properties are represented as NFTs, which can then be divided into fractional shares (tokens) that represent ownership stakes. This enables:
+This project implements a system where real estate properties are represented as NFTs (ERC721) that can be purchased using USDT, which can then be divided into fractional shares (tokens) that represent ownership stakes. This enables:
 
-- Democratization of real estate investment
-- Increased liquidity in real estate markets
-- Transparent ownership tracking on the blockchain
-- Automated dividend distribution from rental income
-- Governance rights for property decisions
+- Understanding of NFTs for asset representation
+- Secure payment processing with ERC20 tokens
+- Property metadata management on-chain
+- Hands-on learning with OpenZeppelin contracts
+- Practical Hardhat development workflow
 
 ## 🏗️ Architecture
 
 ### Core Contracts
 
-- **RealEstateNFT**: ERC721 implementation for property deeds
-- **FractionalOwnership**: ERC20 implementation for ownership shares
-- **PropertyManager**: Administrative contract for property registration and management
-- **DividendDistributor**: Handles rent distribution to fractional owners
+- **BaseErc721PropertyNFT**: ERC721 implementation for property NFTs with USDT payments
+- **MockUSDT**: Mock USDT token for testing payments (ERC20 with 6 decimals)
 
 ### Key Features
 
-- ✅ Property Registration & Verification
-- ✅ Fractional Token Minting
-- ✅ Transfer of Ownership (both NFTs and fractions)
-- ✅ Automated Dividend Distribution
-- ✅ Governance Voting for Property Decisions
-- ✅ Buy/Sell Marketplace Functionality
-- ✅ Emergency Withdrawal Protection
+- ✅ ERC721 Property NFT Minting
+- ✅ USDT Payment Integration
+- ✅ Property Metadata Storage
+- ✅ Owner Administration Controls
+- ✅ Configurable Mint Price
 
 ## 🛠️ Tech Stack
 
 - **Blockchain**: Ethereum/Sepolia Testnet
-- **Smart Contracts**: Solidity ^0.8.28
+- **Smart Contracts**: Solidity ^0.8.27
 - **Development Framework**: Hardhat ^2.28.6
 - **Testing**: Chai + Hardhat Network
 - **Type Safety**: TypeChain
@@ -56,6 +52,7 @@ This project implements a system where real estate properties are represented as
 1. Clone the repository
 ```bash
 git clone <repository-url>
+cd Tokenize-Fractional-Real-Estate-NFT-Solidity-HandsOn-Tutorial
 cd hardhat2
 ```
 
@@ -100,12 +97,12 @@ npx hardhat coverage
 Deploy to local network:
 ```bash
 npx hardhat node
-npx hardhat ignition:deploy ./ignition/modules/FractionalRealEstate.ts --network localhost
+npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --network localhost
 ```
 
 Deploy to Sepolia testnet:
 ```bash
-npx hardhat ignition:deploy ./ignition/modules/FractionalRealEstate.ts --network sepolia
+npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --network sepolia
 ```
 
 ### Verify Contracts
@@ -120,18 +117,13 @@ npx hardhat verify --network sepolia <contract-address> <constructor-arguments>
 ```
 hardhat2/
 ├── contracts/          # Solidity smart contracts
-│   ├── RealEstateNFT.sol
-│   ├── FractionalOwnership.sol
-│   ├── PropertyManager.sol
-│   └── DividendDistributor.sol
+│   ├── BaseErc721PropertyNFT.sol
+│   └── MockUSDT.sol
 ├── ignition/           # Hardhat Ignition deployment modules
 │   └── modules/
-│       └── FractionalRealEstate.ts
+│       └── BaseErc721PropertyNFT.ts
 ├── test/               # Test files
-│   ├── RealEstateNFT.test.ts
-│   ├── FractionalOwnership.test.ts
-│   └── PropertyManager.test.ts
-├── scripts/            # Deployment and utility scripts
+│   └── BaseErc721PropertyNFT.test.js
 ├── .env.example        # Environment variables template
 ├── hardhat.config.js   # Hardhat configuration
 └── package.json        # Dependencies
@@ -139,48 +131,60 @@ hardhat2/
 
 ## 🔍 Contract Workflow
 
-1. **Property Registration**
-   - Property owner registers property via PropertyManager
-   - Property metadata (address, value, legal docs hash) stored on-chain
-   - ERC721 NFT minted to represent property deed
+1. **Deployment**
+   - Deploy BaseErc721PropertyNFT with initial parameters
+   - Configure USDT token address for payments
+   - Set mint price and maximum supply
 
-2. **Fractionalization**
-   - Owner chooses number of fractions to mint
-   - FractionalOwnership contract mints ERC20 tokens
-   - Each token represents percentage ownership
-   - Fractions become tradable
+2. **Property Setup**
+   - Owner sets property metadata (address, value, type, rooms, baths)
+   - Update description, image, and external URL
+   - Metadata stored on-chain and returned in tokenURI
 
-3. **Ownership Transfer**
-   - NFT can be transferred to new owner
-   - Fractions can be freely traded on secondary markets
-   - All transfers recorded immutably on blockchain
+3. **Minting & Purchase**
+   - Owner can safeMint NFTs to any address
+   - Users can purchase NFTs directly with USDT
+   - Each NFT represents a unique property
 
-4. **Income Distribution**
-   - Rental income sent to DividendDistributor
-   - Proportional distributions to all fractional holders
-   - Withdrawable by token holders anytime
-
-5. **Governance**
-   - Major property decisions put to vote
-   - Voting power proportional to fraction ownership
-   - Timelock for implementation of decisions
+4. **Management**
+   - Owner can update mint price
+   - Property metadata can be updated at any time
+   - All changes are permissioned to contract owner
 
 ## 🧪 Testing Strategy
 
-- **Unit Tests**: Individual contract functionality
-- **Integration Tests**: Multi-contract interactions
-- **Fork Tests**: Tests against live network state
-- **Gas Optimization**: Gas usage benchmarking
+Tests are written in JavaScript using Hardhat's testing framework.
+
+### Test Categories
+
+1. **Unit Tests**: Individual contract functions
+2. **Integration Tests**: Multi-contract interactions with MockUSDT
+3. **Access Control**: Verify permission boundaries
+4. **Edge Cases**: Invalid inputs, boundary conditions, metadata handling
+
+### Test Structure
+
+```javascript
+describe("BaseErc721PropertyNFT", function () {
+  beforeEach(async function () {
+    // Setup fixtures
+  });
+
+  it("Should mint a token to the owner (onlyOwner)", async function () {
+    // Test implementation
+  });
+});
+```
 
 ## 🔒 Security Considerations
 
-- ✅ Reentrancy protection
-- ✅ Integer overflow/underflow prevention
-- ✅ Access control modifiers
-- ✅ Timelock for critical operations
-- ✅ Pausable functionality for emergencies
+- ✅ Reentrancy protection (using transferFrom)
+- ✅ Integer overflow/underflow prevention (Solidity 0.8.27)
+- ✅ Access control modifiers (onlyOwner)
 - ✅ Comprehensive input validation
 - ⚠️ External audits recommended before mainnet deployment
+- ⚠️ Timelock not implemented (consider adding for production)
+- ⚠️ Emergency pause functionality not implemented
 
 ## 🤝 Contributing
 

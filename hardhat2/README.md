@@ -9,18 +9,13 @@ Solidity smart contracts for fractional real estate tokenization using Hardhat d
 ```
 hardhat2/
 ├── contracts/          # Solidity smart contracts
-│   ├── RealEstateNFT.sol
-│   ├── FractionalOwnership.sol
-│   ├── PropertyManager.sol
-│   └── DividendDistributor.sol
+│   ├── BaseErc721PropertyNFT.sol
+│   └── MockUSDT.sol
 ├── ignition/           # Hardhat Ignition deployment modules
 │   └── modules/
-│       └── FractionalRealEstate.ts
-├── test/               # TypeScript test files
-│   ├── RealEstateNFT.test.ts
-│   ├── FractionalOwnership.test.ts
-│   └── PropertyManager.test.ts
-├── scripts/            # Deployment and utility scripts
+│       └── BaseErc721PropertyNFT.ts
+├── test/               # JavaScript test files
+│   └── BaseErc721PropertyNFT.test.js
 ├── .env.example        # Environment variables template
 ├── .env                # Environment variables (gitignored)
 ├── hardhat.config.js   # Hardhat configuration
@@ -82,7 +77,7 @@ npx hardhat clean
 npx hardhat test
 
 # Run specific test file
-npx hardhat test test/RealEstateNFT.test.ts
+npx hardhat test test/BaseErc721PropertyNFT.test.js
 
 # Run with verbose output
 npx hardhat test --verbose
@@ -98,7 +93,7 @@ npx hardhat coverage
 npx hardhat node
 
 # Deploy to localhost (in another terminal)
-npx hardhat ignition:deploy ./ignition/modules/FractionalRealEstate.ts --network localhost
+npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --network localhost
 
 # Run tests against localhost
 npx hardhat test --network localhost
@@ -108,10 +103,7 @@ npx hardhat test --network localhost
 
 ```bash
 # Deploy to Sepolia
-npx hardhat ignition:deploy ./ignition/modules/FractionalRealEstate.ts --network sepolia
-
-# Deploy with specific parameters
-npx hardhat run scripts/deploy.ts --network sepolia
+npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --network sepolia
 ```
 
 ### Contract Verification
@@ -126,29 +118,17 @@ npx hardhat verify --network sepolia 0x1234567890abcdef "Property Name" "0xprope
 
 ## 📝 Contract Overview
 
-### RealEstateNFT (ERC721)
-- Represents physical property deeds as NFTs
-- Stores property metadata (address, legal docs hash, etc.)
-- Only mintable by PropertyManager
-- Supports ERC721Enumerable for enumeration
+### BaseErc721PropertyNFT (ERC721)
+- ERC721 token for property NFTs
+- Supports ERC721 metadata with property details
+- Minting with USDT payment
+- `updatePropertyMetadata` function to set property details
+- Owner-only administrative functions
 
-### FractionalOwnership (ERC20)
-- ERC20 token representing fractional ownership
-- Minted against a specific RealEstateNFT
-- Redeemable when fractions are bought back
-- Dividends distributed proportionally
-
-### PropertyManager
-- Registers new properties
-- Mints RealEstateNFTs
-- Controls fractionalization permissions
-- Manages property lifecycle
-
-### DividendDistributor
-- Distributes rental income to fractional owners
-- Supports pull and push mechanisms
-- Tracks unclaimed dividends
-- Emergency withdrawal by admin
+### MockUSDT (ERC20)
+- Mock USDT token for testing payments
+- Standard ERC20 implementation with decimals=6
+- Used for testing purchase functionality
 
 ## 🔧 Configuration
 
@@ -183,13 +163,13 @@ Tests are written in TypeScript using Hardhat's testing framework.
 
 ### Test Structure
 
-```typescript
-describe("RealEstateNFT", () => {
-  beforeEach(async () => {
+```javascript
+describe("BaseErc721PropertyNFT", function () {
+  beforeEach(async function () {
     // Setup fixtures
   });
 
-  it("Should mint NFT with correct properties", async () => {
+  it("Should mint NFT with correct properties", async function () {
     // Test implementation
   });
 });
@@ -235,36 +215,15 @@ npx hardhat test --gas-reporter
 
 ## 🚢 Deployment Workflow
 
-### 1. Prepare Deployment Script
+### 1. Deploy with Hardhat Ignition
 
-Example deployment script in `scripts/deploy.ts`:
-
-```typescript
-import { ethers } from "hardhat";
-
-async function main() {
-  const PropertyManager = await ethers.getContractFactory("PropertyManager");
-  const manager = await PropertyManager.deploy();
-  await manager.waitForDeployment();
-  console.log("PropertyManager deployed to:", await manager.getAddress());
-}
-
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
-```
-
-### 2. Deploy with Hardhat Ignition
+#### BaseErc721PropertyNFT Deployment
 
 ```bash
-npx hardhat ignition:deploy ./ignition/modules/FractionalRealEstate.ts --network sepolia
-```
+# Deploy with default parameters
+npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --network sepolia
 
-### 3. Verify on Etherscan
-
-```bash
-npx hardhat verify --network sepolia <address> <constructor-args>
+# Deployment parameters are defined in the ignition module
 ```
 
 ## 🐛 Troubleshooting
