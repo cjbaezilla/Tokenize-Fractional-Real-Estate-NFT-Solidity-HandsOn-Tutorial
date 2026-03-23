@@ -23,6 +23,8 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
     string private _imageData;
     string private _externalUrl;
 
+    event Purchased(address indexed buyer, uint256 tokenId, uint256 price);
+
     constructor(
         address initialOwner,
         string memory name,
@@ -41,6 +43,18 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
         require(_nextTokenId < maxSupply, "Max supply exceeded");
         uint256 tokenId = _nextTokenId++;
         _safeMint(to, tokenId);
+        return tokenId;
+    }
+
+    function purchase() public payable returns (uint256) {
+        require(msg.value >= mintPrice, "Insufficient payment");
+        require(_nextTokenId < maxSupply, "Max supply exceeded");
+        
+        uint256 tokenId = _nextTokenId++;
+        _safeMint(msg.sender, tokenId);
+        
+        emit Purchased(msg.sender, tokenId, msg.value);
+        
         return tokenId;
     }
 

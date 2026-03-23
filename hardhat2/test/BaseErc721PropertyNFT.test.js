@@ -98,6 +98,131 @@ describe("BaseErc721PropertyNFT", function () {
     });
   });
 
+  describe("Purchase (Public Minting)", function () {
+    it("Should allow anyone to purchase a token with correct payment", async function () {
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+      await expect(baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice }))
+        .to.emit(baseErc721PropertyNFT, "Purchased")
+        .withArgs(nonOwner.address, 0, purchasePrice)
+        .and.to.emit(baseErc721PropertyNFT, "Transfer")
+        .withArgs(ethers.ZeroAddress, nonOwner.address, 0);
+
+      expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
+      expect(await baseErc721PropertyNFT.balanceOf(nonOwner.address)).to.equal(1);
+    });
+
+    it("Should mint a token and transfer to purchaser", async function () {
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+
+      expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
+      expect(await baseErc721PropertyNFT.balanceOf(nonOwner.address)).to.equal(1);
+      expect(await baseErc721PropertyNFT.totalSupply()).to.equal(1);
+    });
+
+    it("Should increment token IDs correctly for multiple purchases", async function () {
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+
+      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+      await baseErc721PropertyNFT.connect(anotherUser).purchase({ value: purchasePrice });
+      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+
+      expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
+      expect(await baseErc721PropertyNFT.ownerOf(1)).to.equal(anotherUser.address);
+      expect(await baseErc721PropertyNFT.ownerOf(2)).to.equal(nonOwner.address);
+
+      expect(await baseErc721PropertyNFT.balanceOf(nonOwner.address)).to.equal(2);
+      expect(await baseErc721PropertyNFT.balanceOf(anotherUser.address)).to.equal(1);
+    });
+
+    it("Should reject insufficient payment", async function () {
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+      const insufficientPayment = purchasePrice - ethers.parseEther("0.01");
+
+      await expect(
+        baseErc721PropertyNFT.connect(nonOwner).purchase({ value: insufficientPayment })
+      ).to.be.revertedWith("Insufficient payment");
+
+      // Also test with zero payment
+      await expect(
+        baseErc721PropertyNFT.connect(nonOwner).purchase({ value: 0 })
+      ).to.be.revertedWith("Insufficient payment");
+    });
+
+    it("Should reject when max supply exceeded", async function () {
+      // Mint all available tokens using safeMint (owner)
+      for (let i = 0; i < MAX_SUPPLY; i++) {
+        await baseErc721PropertyNFT.safeMint(owner.address);
+      }
+
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+      await expect(
+        baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice })
+      ).to.be.revertedWith("Max supply exceeded");
+    });
+
+    it("Should emit Purchased event with correct parameters", async function () {
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+
+      await expect(baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice }))
+        .to.emit(baseErc721PropertyNFT, "Purchased")
+        .withArgs(nonOwner.address, 0, purchasePrice);
+
+      // Second purchase
+      await expect(baseErc721PropertyNFT.connect(anotherUser).purchase({ value: purchasePrice }))
+        .to.emit(baseErc721PropertyNFT, "Purchased")
+        .withArgs(anotherUser.address, 1, purchasePrice);
+    });
+
+    it("Should work with overpayment (accept exact mintPrice)", async function () {
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+      const overpayment = purchasePrice + ethers.parseEther("0.05");
+
+      await expect(baseErc721PropertyNFT.connect(nonOwner).purchase({ value: overpayment }))
+        .to.emit(baseErc721PropertyNFT, "Purchased")
+        .withArgs(nonOwner.address, 0, overpayment);
+
+      expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
+    });
+
+    it("Should maintain correct balance after multiple purchases", async function () {
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+
+      // nonOwner purchases 3 tokens
+      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+
+      expect(await baseErc721PropertyNFT.balanceOf(nonOwner.address)).to.equal(3);
+      expect(await baseErc721PropertyNFT.totalSupply()).to.equal(3);
+    });
+
+    it("Should allow purchase after metadata is set", async function () {
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+
+      // Set metadata before purchase
+      await baseErc721PropertyNFT.updatePropertyMetadata(
+        PROPERTY_ADDRESS,
+        PROPERTY_VALUE,
+        PROPERTY_TYPE,
+        PROPERTY_ROOMS,
+        PROPERTY_BATHS,
+        DESCRIPTION,
+        IMAGE_DATA,
+        EXTERNAL_URL
+      );
+
+      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+
+      expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
+
+      // Verify tokenURI includes the metadata
+      const tokenURI = await baseErc721PropertyNFT.tokenURI(0);
+      const parsed = JSON.parse(tokenURI);
+      expect(parsed.description).to.equal(DESCRIPTION);
+    });
+  });
+
   describe("Property Metadata", function () {
     beforeEach(async function () {
       await baseErc721PropertyNFT.safeMint(owner.address);
