@@ -4,6 +4,7 @@ pragma solidity ^0.8.27;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract BaseErc721PropertyNFT is ERC721, Ownable {
@@ -12,6 +13,9 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
     
     // Price in wei considering 6 decimals for USDT (1 USDT = 1e6)
     uint256 public mintPrice; 
+    
+    // USDT token address for payments
+    IERC20 public usdtToken;
     
     // Individual property metadata storage
     string private _propertyAddress;
@@ -30,13 +34,15 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
         string memory name,
         string memory ticker,
         uint256 _maxSupply,
-        uint256 _mintPrice
+        uint256 _mintPrice,
+        address _usdtToken
     )
         ERC721(name, ticker)
         Ownable(initialOwner)
     {
         maxSupply = _maxSupply;
         mintPrice = _mintPrice;
+        usdtToken = IERC20(_usdtToken);
     }
 
     function safeMint(address to) public onlyOwner returns (uint256) {
@@ -46,14 +52,17 @@ contract BaseErc721PropertyNFT is ERC721, Ownable {
         return tokenId;
     }
 
-    function purchase() public payable returns (uint256) {
-        require(msg.value >= mintPrice, "Insufficient payment");
+    function purchase() public returns (uint256) {
         require(_nextTokenId < maxSupply, "Max supply exceeded");
+        
+        // Transfer USDT from buyer to owner
+        bool transferred = usdtToken.transferFrom(msg.sender, owner(), mintPrice);
+        require(transferred, "USDT transfer failed");
         
         uint256 tokenId = _nextTokenId++;
         _safeMint(msg.sender, tokenId);
         
-        emit Purchased(msg.sender, tokenId, msg.value);
+        emit Purchased(msg.sender, tokenId, mintPrice);
         
         return tokenId;
     }

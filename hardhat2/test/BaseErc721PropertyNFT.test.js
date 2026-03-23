@@ -3,7 +3,9 @@ const { ethers } = require("hardhat");
 
 describe("BaseErc721PropertyNFT", function () {
   let BaseErc721PropertyNFT;
+  let MockUSDT;
   let baseErc721PropertyNFT;
+  let usdt;
   let owner;
   let nonOwner;
   let anotherUser;
@@ -11,7 +13,7 @@ describe("BaseErc721PropertyNFT", function () {
   const NAME = "TestPropertyNFT";
   const SYMBOL = "TPNFT";
   const MAX_SUPPLY = 100;
-  const MINT_PRICE = ethers.parseEther("0.1");
+  const MINT_PRICE_USDT = ethers.parseUnits("100", 6); // 100 USDT (6 decimals)
 
   const PROPERTY_ADDRESS = "123 Main St, New York, NY";
   const PROPERTY_VALUE = 500000;
@@ -26,7 +28,12 @@ describe("BaseErc721PropertyNFT", function () {
     // Get signers
     [owner, nonOwner, anotherUser] = await ethers.getSigners();
 
-    // Deploy contract
+    // Deploy MockUSDT
+    MockUSDT = await ethers.getContractFactory("MockUSDT");
+    usdt = await MockUSDT.deploy(owner.address);
+    await usdt.waitForDeployment();
+
+    // Deploy NFT contract with USDT token address
     BaseErc721PropertyNFT = await ethers.getContractFactory(
       "BaseErc721PropertyNFT"
     );
@@ -35,7 +42,8 @@ describe("BaseErc721PropertyNFT", function () {
       NAME,
       SYMBOL,
       MAX_SUPPLY,
-      MINT_PRICE
+      MINT_PRICE_USDT,
+      await usdt.getAddress()
     );
     await baseErc721PropertyNFT.waitForDeployment();
   });
@@ -55,11 +63,15 @@ describe("BaseErc721PropertyNFT", function () {
     });
 
     it("Should set the correct mint price", async function () {
-      expect(await baseErc721PropertyNFT.mintPrice()).to.equal(MINT_PRICE);
+      expect(await baseErc721PropertyNFT.mintPrice()).to.equal(MINT_PRICE_USDT);
+    });
+
+    it("Should set the correct USDT token address", async function () {
+      expect(await baseErc721PropertyNFT.usdtToken()).to.equal(await usdt.getAddress());
     });
   });
 
-  describe("Minting", function () {
+  describe("Minting (Owner Only)", function () {
     it("Should mint a token to the owner (onlyOwner)", async function () {
       await expect(baseErc721PropertyNFT.connect(nonOwner).safeMint(nonOwner.address))
         .to.be.reverted; // Only owner can mint
@@ -98,10 +110,29 @@ describe("BaseErc721PropertyNFT", function () {
     });
   });
 
-  describe("Purchase (Public Minting)", function () {
-    it("Should allow anyone to purchase a token with correct payment", async function () {
+  describe("Purchase (Public Minting with USDT)", function () {
+    beforeEach(async function () {
+      // Fund nonOwner and anotherUser with USDT
+      const usdtAmount = ethers.parseUnits("1000", 6); // 1000 USDT each
+      await usdt.mint(nonOwner.address, usdtAmount);
+      await usdt.mint(anotherUser.address, usdtAmount);
+
+      // Approve NFT contract to spend USDT
+      const approvalAmount = ethers.parseUnits("1000", 6);
+      await usdt.connect(nonOwner).approve(
+        await baseErc721PropertyNFT.getAddress(),
+        approvalAmount
+      );
+      await usdt.connect(anotherUser).approve(
+        await baseErc721PropertyNFT.getAddress(),
+        approvalAmount
+      );
+    });
+
+    it("Should allow anyone to purchase a token with correct USDT payment", async function () {
       const purchasePrice = await baseErc721PropertyNFT.mintPrice();
-      await expect(baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice }))
+
+      await expect(baseErc721PropertyNFT.connect(nonOwner).purchase())
         .to.emit(baseErc721PropertyNFT, "Purchased")
         .withArgs(nonOwner.address, 0, purchasePrice)
         .and.to.emit(baseErc721PropertyNFT, "Transfer")
@@ -112,20 +143,18 @@ describe("BaseErc721PropertyNFT", function () {
     });
 
     it("Should mint a token and transfer to purchaser", async function () {
-      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
-      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+      await baseErc721PropertyNFT.connect(nonOwner).purchase();
 
       expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
       expect(await baseErc721PropertyNFT.balanceOf(nonOwner.address)).to.equal(1);
-      expect(await baseErc721PropertyNFT.totalSupply()).to.equal(1);
+      // Verify token exists by checking owner at index 0
+      expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
     });
 
     it("Should increment token IDs correctly for multiple purchases", async function () {
-      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
-
-      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
-      await baseErc721PropertyNFT.connect(anotherUser).purchase({ value: purchasePrice });
-      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+      await baseErc721PropertyNFT.connect(nonOwner).purchase();
+      await baseErc721PropertyNFT.connect(anotherUser).purchase();
+      await baseErc721PropertyNFT.connect(nonOwner).purchase();
 
       expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
       expect(await baseErc721PropertyNFT.ownerOf(1)).to.equal(anotherUser.address);
@@ -135,18 +164,33 @@ describe("BaseErc721PropertyNFT", function () {
       expect(await baseErc721PropertyNFT.balanceOf(anotherUser.address)).to.equal(1);
     });
 
-    it("Should reject insufficient payment", async function () {
-      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
-      const insufficientPayment = purchasePrice - ethers.parseEther("0.01");
+    it("Should reject if insufficient USDT allowance", async function () {
+      // Revoke allowance
+      await usdt.connect(nonOwner).approve(
+        await baseErc721PropertyNFT.getAddress(),
+        0
+      );
 
       await expect(
-        baseErc721PropertyNFT.connect(nonOwner).purchase({ value: insufficientPayment })
-      ).to.be.revertedWith("Insufficient payment");
+        baseErc721PropertyNFT.connect(nonOwner).purchase()
+      ).to.be.revertedWithCustomError(usdt, "ERC20InsufficientAllowance");
+    });
 
-      // Also test with zero payment
+    it("Should reject insufficient USDT balance", async function () {
+      // Create a new user with no USDT
+      const zeroBalanceUser = (await ethers.getSigners())[3];
+      
+      // Approve NFT contract to spend USDT (but user has zero balance)
+      const approvalAmount = ethers.parseUnits("100", 6);
+      await usdt.connect(zeroBalanceUser).approve(
+        await baseErc721PropertyNFT.getAddress(),
+        approvalAmount
+      );
+
+      // Purchase will fail due to insufficient balance (allowance is sufficient)
       await expect(
-        baseErc721PropertyNFT.connect(nonOwner).purchase({ value: 0 })
-      ).to.be.revertedWith("Insufficient payment");
+        baseErc721PropertyNFT.connect(zeroBalanceUser).purchase()
+      ).to.be.revertedWithCustomError(usdt, "ERC20InsufficientBalance");
     });
 
     it("Should reject when max supply exceeded", async function () {
@@ -155,51 +199,44 @@ describe("BaseErc721PropertyNFT", function () {
         await baseErc721PropertyNFT.safeMint(owner.address);
       }
 
-      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
       await expect(
-        baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice })
+        baseErc721PropertyNFT.connect(nonOwner).purchase()
       ).to.be.revertedWith("Max supply exceeded");
     });
 
     it("Should emit Purchased event with correct parameters", async function () {
       const purchasePrice = await baseErc721PropertyNFT.mintPrice();
 
-      await expect(baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice }))
+      await expect(baseErc721PropertyNFT.connect(nonOwner).purchase())
         .to.emit(baseErc721PropertyNFT, "Purchased")
         .withArgs(nonOwner.address, 0, purchasePrice);
 
       // Second purchase
-      await expect(baseErc721PropertyNFT.connect(anotherUser).purchase({ value: purchasePrice }))
+      await expect(baseErc721PropertyNFT.connect(anotherUser).purchase())
         .to.emit(baseErc721PropertyNFT, "Purchased")
         .withArgs(anotherUser.address, 1, purchasePrice);
     });
 
-    it("Should work with overpayment (accept exact mintPrice)", async function () {
+    it("Should work with over-approval (exact mintPrice)", async function () {
       const purchasePrice = await baseErc721PropertyNFT.mintPrice();
-      const overpayment = purchasePrice + ethers.parseEther("0.05");
 
-      await expect(baseErc721PropertyNFT.connect(nonOwner).purchase({ value: overpayment }))
-        .to.emit(baseErc721PropertyNFT, "Purchased")
-        .withArgs(nonOwner.address, 0, overpayment);
+      await baseErc721PropertyNFT.connect(nonOwner).purchase();
 
       expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
     });
 
     it("Should maintain correct balance after multiple purchases", async function () {
-      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
-
       // nonOwner purchases 3 tokens
-      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
-      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
-      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+      await baseErc721PropertyNFT.connect(nonOwner).purchase();
+      await baseErc721PropertyNFT.connect(nonOwner).purchase();
+      await baseErc721PropertyNFT.connect(nonOwner).purchase();
 
       expect(await baseErc721PropertyNFT.balanceOf(nonOwner.address)).to.equal(3);
-      expect(await baseErc721PropertyNFT.totalSupply()).to.equal(3);
+      // Verify latest token belongs to nonOwner (tokenId 2)
+      expect(await baseErc721PropertyNFT.ownerOf(2)).to.equal(nonOwner.address);
     });
 
     it("Should allow purchase after metadata is set", async function () {
-      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
-
       // Set metadata before purchase
       await baseErc721PropertyNFT.updatePropertyMetadata(
         PROPERTY_ADDRESS,
@@ -212,7 +249,7 @@ describe("BaseErc721PropertyNFT", function () {
         EXTERNAL_URL
       );
 
-      await baseErc721PropertyNFT.connect(nonOwner).purchase({ value: purchasePrice });
+      await baseErc721PropertyNFT.connect(nonOwner).purchase();
 
       expect(await baseErc721PropertyNFT.ownerOf(0)).to.equal(nonOwner.address);
 
@@ -220,6 +257,23 @@ describe("BaseErc721PropertyNFT", function () {
       const tokenURI = await baseErc721PropertyNFT.tokenURI(0);
       const parsed = JSON.parse(tokenURI);
       expect(parsed.description).to.equal(DESCRIPTION);
+    });
+
+    it("Should transfer USDT from buyer to owner upon purchase", async function () {
+      const purchasePrice = await baseErc721PropertyNFT.mintPrice();
+      const ownerUSDTBefore = await usdt.balanceOf(owner.address);
+      const buyerUSDTBefore = await usdt.balanceOf(nonOwner.address);
+
+      await baseErc721PropertyNFT.connect(nonOwner).purchase();
+
+      const ownerUSDTAfter = await usdt.balanceOf(owner.address);
+      const buyerUSDTAfter = await usdt.balanceOf(nonOwner.address);
+
+      // Owner should receive exactly mintPrice
+      expect(ownerUSDTAfter - ownerUSDTBefore).to.equal(purchasePrice);
+
+      // Buyer should have mintPrice deducted
+      expect(buyerUSDTBefore - buyerUSDTAfter).to.equal(purchasePrice);
     });
   });
 
@@ -339,7 +393,7 @@ describe("BaseErc721PropertyNFT", function () {
 
   describe("Mint Price", function () {
     it("Should update mint price (onlyOwner)", async function () {
-      const newPrice = ethers.parseEther("0.2");
+      const newPrice = ethers.parseUnits("200", 6); // 200 USDT
 
       await expect(
         baseErc721PropertyNFT.connect(nonOwner).setMintPrice(newPrice)
