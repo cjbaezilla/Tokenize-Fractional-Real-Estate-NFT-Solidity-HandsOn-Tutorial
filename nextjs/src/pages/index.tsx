@@ -128,79 +128,82 @@ const Home: NextPage = () => {
               <p>Connect your wallet to access the dashboard</p>
             </div>
           </div>
-        ) : (
-          <div className={styles.dashboard}>
-            {/* Stats Overview */}
-            <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>
-                <div className={styles.sectionIcon}>📊</div>
-                Portfolio Overview
-              </h2>
-              <div className={styles.statsGrid}>
-                <div className={styles.statCard}>
-                  <div className={styles.statValue}>{nftBalance ? Number(nftBalance) : 0}</div>
-                  <div className={styles.statLabel}>NFTs Owned</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statValue}>{formatUSDT(usdtBalance, usdtDecimals)}</div>
-                  <div className={styles.statLabel}>USDT Balance</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statValue}>{maxSupply ? Number(maxSupply.toString()) : 'N/A'}</div>
-                  <div className={styles.statLabel}>Max Supply</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statValue}>{formatUSDT(mintPrice, usdtDecimals)}</div>
-                  <div className={styles.statLabel}>Mint Price (USDT)</div>
+         ) : (
+           <div className={styles.dashboard}>
+             {/* Top Sections Grid */}
+             <div className={styles.topSectionsGrid}>
+               {/* Stats Overview */}
+               <div className={styles.section}>
+                 <h2 className={styles.sectionTitle}>
+                   <div className={styles.sectionIcon}>📊</div>
+                   Portfolio Overview
+                 </h2>
+                 <div className={styles.statsGrid}>
+                   <div className={styles.statCard}>
+                     <div className={styles.statValue}>{nftBalance ? Number(nftBalance) : 0}</div>
+                     <div className={styles.statLabel}>NFTs Owned</div>
+                   </div>
+                   <div className={styles.statCard}>
+                     <div className={styles.statValue}>{formatUSDT(usdtBalance, usdtDecimals)}</div>
+                     <div className={styles.statLabel}>USDT Balance</div>
+                   </div>
+                   <div className={styles.statCard}>
+                     <div className={styles.statValue}>{maxSupply ? Number(maxSupply.toString()) : 'N/A'}</div>
+                     <div className={styles.statLabel}>Max Supply</div>
+                   </div>
+                   <div className={styles.statCard}>
+                     <div className={styles.statValue}>{formatUSDT(mintPrice, usdtDecimals)}</div>
+                     <div className={styles.statLabel}>Mint Price (USDT)</div>
+                   </div>
+                 </div>
+               </div>
+
+               {/* Minting Section */}
+               <div className={styles.section}>
+                 <h2 className={styles.sectionTitle}>
+                   <div className={styles.sectionIcon}>🪙</div>
+                   Mint New NFT
+                 </h2>
+                 <div className={styles.mintSection}>
+                   <div className={styles.mintInfo}>
+                     <p>Purchase a fractional share of this property as an NFT.</p>
+                     <div className={styles.mintPrice}>
+                       {mintPrice && usdtDecimals ? `${formatUSDT(mintPrice, usdtDecimals)} ${usdtSymbol || 'USDT'}` : 'Loading...'}
+                     </div>
+                     <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>
+                       {maxSupply ? `Total Supply: ${Number(maxSupply.toString())} NFTs` : 'Loading...'}
+                     </p>
+                   </div>
+                  <button
+                    className={styles.mintButton}
+                    onClick={handleMint}
+                    disabled={isPending || !isConnected}
+                  >
+                    {isPending ? 'Processing...' : 'Mint NFT Now'}
+                  </button>
+                  {error && (
+                    <div className={styles.error}>
+                      Error: {error.message}
+                    </div>
+                  )}
+                  {isSuccess && (
+                    <div style={{
+                      background: 'rgba(16, 185, 129, 0.1)',
+                      border: '1px solid var(--success)',
+                      color: 'var(--success)',
+                      padding: '1rem',
+                      borderRadius: '12px',
+                      marginTop: '1rem'
+                    }}>
+                      ✓ NFT minted successfully!
+                      <div style={{ fontFamily: 'monospace', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                        Transaction: {truncateAddress(hash || '')}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-             </div>
-
-             {/* Minting Section */}
-             <div className={styles.section}>
-               <h2 className={styles.sectionTitle}>
-                 <div className={styles.sectionIcon}>🪙</div>
-                 Mint New NFT
-               </h2>
-               <div className={styles.mintSection}>
-                  <div className={styles.mintInfo}>
-                    <p>Purchase a fractional share of this property as an NFT.</p>
-                    <div className={styles.mintPrice}>
-                      {mintPrice && usdtDecimals ? `${formatUSDT(mintPrice, usdtDecimals)} ${usdtSymbol || 'USDT'}` : 'Loading...'}
-                    </div>
-                    <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>
-                      {maxSupply ? `Total Supply: ${Number(maxSupply.toString())} NFTs` : 'Loading...'}
-                    </p>
-                  </div>
-                 <button
-                   className={styles.mintButton}
-                   onClick={handleMint}
-                   disabled={isPending || !isConnected}
-                 >
-                   {isPending ? 'Processing...' : 'Mint NFT Now'}
-                 </button>
-                 {error && (
-                   <div className={styles.error}>
-                     Error: {error.message}
-                   </div>
-                 )}
-                 {isSuccess && (
-                   <div style={{
-                     background: 'rgba(16, 185, 129, 0.1)',
-                     border: '1px solid var(--success)',
-                     color: 'var(--success)',
-                     padding: '1rem',
-                     borderRadius: '12px',
-                     marginTop: '1rem'
-                   }}>
-                     ✓ NFT minted successfully!
-                     <div style={{ fontFamily: 'monospace', fontSize: '0.875rem', marginTop: '0.5rem' }}>
-                       Transaction: {truncateAddress(hash || '')}
-                     </div>
-                   </div>
-                 )}
-               </div>
-             </div>
+            </div>
 
              {/* Property Details & Minting */}
              <div className={styles.propertyGrid}>

@@ -91,6 +91,18 @@
   font-size: 1rem;
 }
 
+.topSectionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .topSectionsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .propertyGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
