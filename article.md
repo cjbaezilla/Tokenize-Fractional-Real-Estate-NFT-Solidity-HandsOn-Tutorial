@@ -1,4 +1,6 @@
-# Understanding Fractional Real Estate Tokenization: A Complete Hands-On Guide
+# Building a Fractional Real Estate NFT Platform: A Hands-On Tutorial for Tokenization on Ethereum using Solidity and Next.js
+
+![Cover](./images/screenshot_main.png)
 
 ## Introduction: The Future of Property Investment
 
@@ -717,6 +719,44 @@ To test the complete purchase flow:
 6. Confirm the second transaction. Upon success, you should see a success message and your NFT balance should increase to 1.
 
 View the minted NFT in your wallet by switching to the NFTs tab. You may need to add the NFT contract address manually if your wallet does not auto-detect it.
+
+### The Purchase Lifecycle: Step-by-Step Visual Guide
+
+The actual purchase process involves a clear sequence of interactions between the user, wallet, and smart contracts. Let's examine each step with visual references from a typical testnet transaction.
+
+#### Step 1: Approving USDT Token
+
+Before the NFT contract can transfer your USDT tokens, you must first grant it permission. This is done through the standard ERC20 `approve` function. Click the "Approve USDT" button in your wallet interface to authorize the spending.
+
+![Approving USDT for purchase](./images/screenshot_approving_purchase.png)
+
+This approval transaction costs gas and creates an allowance entry in the USDT token contract, allowing the NFT contract to spend up to the specified amount from your wallet.
+
+#### Step 2: Purchasing Tokens
+
+Once the approval transaction confirms, the interface switches to show the "Mint NFT Now" button. Clicking this triggers the purchase function, which calls `transferFrom` on the USDT contract to move the required payment to the contract owner, then mints the NFT to your address.
+
+![Purchasing tokens](./images/screenshot_purchasing.png)
+
+The purchase transaction executes two critical operations atomically: the USDT transfer and the NFT minting. Both succeed or fail together, ensuring consistency.
+
+#### Step 3: Viewing Minted Tokens in Wallet
+
+After the transaction confirms (typically within seconds on testnet), the newly minted NFT appears in your wallet under the NFTs tab. Each token represents your fractional ownership stake in the property.
+
+![Minted tokens in wallet](./images/screenshot_final_minted_tokens.png)
+
+The wallet may require a manual refresh to detect the new NFT. You can add the NFT contract address to your wallet's watch list if it doesn't appear automatically.
+
+#### Step 4: Transaction Details on Block Explorer
+
+Every blockchain transaction is permanently recorded and publicly viewable. You can examine the complete transaction details, including gas costs, timestamps, and internal calls, using a block explorer like Etherscan.
+
+![Transaction details](./images/purchase_transaction.png)
+
+[View on Sepolia Etherscan](https://sepolia.etherscan.io/tx/0x83e90fca156ee8bf93fddc33a4dcbce9eda83d36f1ce6ea5c97d38ac1bd2400e)
+
+The transaction log shows all events emitted during the purchase, including the Transfer event (NFT minting) and the ERC20 Approval and Transfer events. This transparency is a key benefit of blockchain technology.
 
 ### Testnet Deployment
 
