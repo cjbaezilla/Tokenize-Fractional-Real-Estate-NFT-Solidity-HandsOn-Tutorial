@@ -71,24 +71,28 @@ export const useMockUsdt = () => {
     });
   };
 
-  return {
-    // Data with type assertions
-    balance: balance.data as bigint | undefined,
-    symbol: symbol.data as string | undefined,
-    decimals: decimals.data as bigint | undefined,
-    useAllowance,
-    
-    // Status
-    isLoading: balance.isLoading || symbol.isLoading || decimals.isLoading,
-    isPending,
-    isWaitingForTransaction,
-    isSuccess,
-    error,
-    hash,
+   return {
+     // Data with type assertions
+     balance: balance.data as bigint | undefined,
+     symbol: symbol.data as string | undefined,
+     decimals: decimals.data as bigint | undefined,
+     useAllowance,
+     
+     // Status
+     isLoading: balance.isLoading || symbol.isLoading || decimals.isLoading,
+     isPending,
+     isWaitingForTransaction,
+     isSuccess,
+     error,
+     hash,
+     
+     // Refetch functions
+     refetchBalance: balance.refetch,
+     refetchAllowance: (spender: string) => useAllowance(spender).refetch,
 
-    // Actions
-    approve,
-    mint,
-    transfer,
-  };
+     // Actions
+     approve,
+     mint,
+     transfer,
+   };
 };
