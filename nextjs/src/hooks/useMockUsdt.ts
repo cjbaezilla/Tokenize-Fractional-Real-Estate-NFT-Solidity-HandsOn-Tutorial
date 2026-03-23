@@ -33,7 +33,7 @@ export const useMockUsdt = () => {
     functionName: 'decimals',
   });
 
-  const getAllowance = (spender: string) => useReadContract({
+  const useAllowance = (spender: string) => useReadContract({
     address: MOCK_USDT_ADDRESS,
     abi,
     functionName: 'allowance',
@@ -72,11 +72,11 @@ export const useMockUsdt = () => {
   };
 
   return {
-    // Data
-    balance: balance.data,
-    symbol: symbol.data,
-    decimals: decimals.data,
-    getAllowance,
+    // Data with type assertions
+    balance: balance.data as bigint | undefined,
+    symbol: symbol.data as string | undefined,
+    decimals: decimals.data as bigint | undefined,
+    useAllowance,
     
     // Status
     isLoading: balance.isLoading || symbol.isLoading || decimals.isLoading,

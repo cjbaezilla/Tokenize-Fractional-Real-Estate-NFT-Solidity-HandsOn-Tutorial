@@ -1,102 +1,402 @@
 .container {
-  padding: 0 2rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
 }
 
 .main {
-  min-height: 100vh;
-  padding: 4rem 0;
   flex: 1;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.dashboard {
+  display: grid;
+  gap: 2rem;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-primary);
+}
+
+.sectionIcon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.propertyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .propertyGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.propertyImage {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--surface-light);
+}
+
+.propertyDetails {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  gap: 1.5rem;
 }
 
-.footer {
-  display: flex;
-  flex: 1;
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea;
-  justify-content: center;
-  align-items: center;
+.propertyInfo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
 }
 
-.footer a {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
+.infoCard {
+  background: var(--surface-light);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
 }
 
-.title a {
-  color: #0d76fc;
-  text-decoration: none;
+.infoLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.title a:hover,
-.title a:focus,
-.title a:active {
-  text-decoration: underline;
+.infoValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-.title {
-  margin: 3rem 0;
-  line-height: 1;
-  font-size: 2.5rem;
+.infoValue.highlight {
+  color: var(--secondary);
 }
 
-.title,
 .description {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.balancesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.balanceCard {
+  background: linear-gradient(135deg, var(--surface-light), var(--surface));
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.balanceCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+.balanceLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.balanceValue {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.balanceSymbol {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-left: 0.5rem;
+}
+
+.mintSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.mintInfo {
+  background: var(--surface-light);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.mintPrice {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin: 1rem 0;
+}
+
+.mintButton {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.mintButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+}
+
+.mintButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.contractInfo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.contractCard {
+  background: var(--surface-light);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.contractLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.contractValue {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: var(--surface-light);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
   text-align: center;
 }
 
-.description {
-  margin: 0 0 2rem;
-  line-height: 1.5;
-  font-size: 1.5rem;
+.statValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
 }
 
-.grid {
+.statLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+.transactions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.transactionItem {
+  background: var(--surface-light);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transactionType {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.transactionHash {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.transactionTime {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  margin-top: auto;
+}
+
+.loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  max-width: 800px;
+  padding: 3rem;
+  color: var(--text-secondary);
 }
 
-.card {
-  margin: 1rem;
-  padding: 1.5rem;
-  text-align: left;
-  color: inherit;
-  text-decoration: none;
-  border: 1px solid #eaeaea;
-  border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  max-width: 350px;
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--error);
+  color: var(--error);
+  padding: 1rem;
+  border-radius: 12px;
+  margin: 1rem 0;
 }
 
-.card:hover,
-.card:focus,
-.card:active {
-  color: #0d76fc;
-  border-color: #0d76fc;
+.walletInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
 }
 
-.card h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.2rem;
+.walletAddress {
+  font-family: 'Courier New', monospace;
+  background: var(--surface-light);
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
 }
 
-.card p {
-  margin: 0;
-  font-size: 1.2rem;
-  line-height: 1.5;
-}
-
-@media (max-width: 600px) {
-  .grid {
-    width: 100%;
-    flex-direction: column;
+@media (max-width: 768px) {
+  .main {
+    padding: 1rem;
   }
+  
+  .header {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .propertyInfo {
+    grid-template-columns: 1fr;
+  }
+  
+  .balancesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.connectButton {
+  background: var(--primary) !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+.connectButton:hover {
+  background: var(--primary-dark) !important;
 }

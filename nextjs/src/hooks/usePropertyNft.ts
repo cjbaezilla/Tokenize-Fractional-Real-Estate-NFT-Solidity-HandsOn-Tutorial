@@ -97,18 +97,32 @@ export const usePropertyNft = () => {
     });
   };
 
+  const imageData = useReadContract({
+    address: PROPERTY_NFT_ADDRESS,
+    abi,
+    functionName: 'getImageData',
+  });
+
+  const externalUrl = useReadContract({
+    address: PROPERTY_NFT_ADDRESS,
+    abi,
+    functionName: 'getExternalUrl',
+  });
+
   return {
-    // Data
-    name: name.data,
-    symbol: symbol.data,
-    maxSupply: maxSupply.data,
-    mintPrice: mintPrice.data,
-    propertyAddress: propertyAddress.data,
-    propertyValue: propertyValue.data,
-    propertyType: propertyType.data,
-    propertyRooms: propertyRooms.data,
-    propertyBaths: propertyBaths.data,
-    description: description.data,
+    // Data with type assertions
+    name: name.data as string | undefined,
+    symbol: symbol.data as string | undefined,
+    maxSupply: maxSupply.data as bigint | undefined,
+    mintPrice: mintPrice.data as bigint | undefined,
+    propertyAddress: propertyAddress.data as string | undefined,
+    propertyValue: propertyValue.data as bigint | undefined,
+    propertyType: propertyType.data as string | undefined,
+    propertyRooms: propertyRooms.data as bigint | undefined,
+    propertyBaths: propertyBaths.data as bigint | undefined,
+    description: description.data as string | undefined,
+    imageData: imageData.data as string | undefined,
+    externalUrl: externalUrl.data as string | undefined,
     
     // Status
     isLoading: name.isLoading || symbol.isLoading || maxSupply.isLoading || mintPrice.isLoading,
