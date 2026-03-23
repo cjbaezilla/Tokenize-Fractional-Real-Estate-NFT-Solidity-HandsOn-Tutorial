@@ -103,24 +103,17 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Fractional Real Estate NFT Dashboard</title>
-        <meta name="description" content="Tokenize and invest in fractional real estate NFTs" />
+        <title>Fractional Real Estate NFT RWA Tokenization Dashboard</title>
+        <meta name="description" content="Tokenize and invest in fractional real estate NFT RWA tokenization" />
         <link href="/favicon.ico" rel="icon" />
       </Head>
 
       <header className={styles.header}>
         <div className={styles.logo}>
           <div className={styles.logoIcon}>🏠</div>
-          <span>PropToken</span>
+          <span>Fractional Real Estate NFT RWA Tokenization</span>
         </div>
         <div className={styles.walletInfo}>
-          {isConnected && address && (
-            <>
-              <span className={styles.walletAddress}>
-                {truncateAddress(address)}
-              </span>
-            </>
-          )}
           <div className={styles.connectButton}>
             <ConnectButton />
           </div>
@@ -131,7 +124,7 @@ const Home: NextPage = () => {
         {!isConnected ? (
           <div className={styles.section}>
             <div className={styles.loading}>
-              <h2>Welcome to PropToken</h2>
+              <h2>Welcome to Fractional Real Estate NFT RWA Tokenization</h2>
               <p>Connect your wallet to access the dashboard</p>
             </div>
           </div>
@@ -161,10 +154,56 @@ const Home: NextPage = () => {
                   <div className={styles.statLabel}>Mint Price (USDT)</div>
                 </div>
               </div>
-            </div>
+             </div>
 
-            {/* Property Details & Minting */}
-            <div className={styles.propertyGrid}>
+             {/* Minting Section */}
+             <div className={styles.section}>
+               <h2 className={styles.sectionTitle}>
+                 <div className={styles.sectionIcon}>🪙</div>
+                 Mint New NFT
+               </h2>
+               <div className={styles.mintSection}>
+                  <div className={styles.mintInfo}>
+                    <p>Purchase a fractional share of this property as an NFT.</p>
+                    <div className={styles.mintPrice}>
+                      {mintPrice && usdtDecimals ? `${formatUSDT(mintPrice, usdtDecimals)} ${usdtSymbol || 'USDT'}` : 'Loading...'}
+                    </div>
+                    <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>
+                      {maxSupply ? `Total Supply: ${Number(maxSupply.toString())} NFTs` : 'Loading...'}
+                    </p>
+                  </div>
+                 <button
+                   className={styles.mintButton}
+                   onClick={handleMint}
+                   disabled={isPending || !isConnected}
+                 >
+                   {isPending ? 'Processing...' : 'Mint NFT Now'}
+                 </button>
+                 {error && (
+                   <div className={styles.error}>
+                     Error: {error.message}
+                   </div>
+                 )}
+                 {isSuccess && (
+                   <div style={{
+                     background: 'rgba(16, 185, 129, 0.1)',
+                     border: '1px solid var(--success)',
+                     color: 'var(--success)',
+                     padding: '1rem',
+                     borderRadius: '12px',
+                     marginTop: '1rem'
+                   }}>
+                     ✓ NFT minted successfully!
+                     <div style={{ fontFamily: 'monospace', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                       Transaction: {truncateAddress(hash || '')}
+                     </div>
+                   </div>
+                 )}
+               </div>
+             </div>
+
+             {/* Property Details & Minting */}
+             <div className={styles.propertyGrid}>
               <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>
                   <div className={styles.sectionIcon}>🏘️</div>
@@ -242,55 +281,9 @@ const Home: NextPage = () => {
                   </div>
                 </div>
               </div>
-            </div>
+             </div>
 
-            {/* Minting Section */}
-            <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>
-                <div className={styles.sectionIcon}>🪙</div>
-                Mint New NFT
-              </h2>
-              <div className={styles.mintSection}>
-                 <div className={styles.mintInfo}>
-                   <p>Purchase a fractional share of this property as an NFT.</p>
-                   <div className={styles.mintPrice}>
-                     {mintPrice && usdtDecimals ? `${formatUSDT(mintPrice, usdtDecimals)} ${usdtSymbol || 'USDT'}` : 'Loading...'}
-                   </div>
-                   <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>
-                     {maxSupply ? `Total Supply: ${Number(maxSupply.toString())} NFTs` : 'Loading...'}
-                   </p>
-                 </div>
-                <button
-                  className={styles.mintButton}
-                  onClick={handleMint}
-                  disabled={isPending || !isConnected}
-                >
-                  {isPending ? 'Processing...' : 'Mint NFT Now'}
-                </button>
-                {error && (
-                  <div className={styles.error}>
-                    Error: {error.message}
-                  </div>
-                )}
-                {isSuccess && (
-                  <div style={{
-                    background: 'rgba(16, 185, 129, 0.1)',
-                    border: '1px solid var(--success)',
-                    color: 'var(--success)',
-                    padding: '1rem',
-                    borderRadius: '12px',
-                    marginTop: '1rem'
-                  }}>
-                    ✓ NFT minted successfully!
-                    <div style={{ fontFamily: 'monospace', fontSize: '0.875rem', marginTop: '0.5rem' }}>
-                      Transaction: {truncateAddress(hash || '')}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Contract Information */}
+             {/* Contract Information */}
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>
                 <div className={styles.sectionIcon}>📜</div>
@@ -343,7 +336,7 @@ const Home: NextPage = () => {
       </main>
 
       <footer className={styles.footer}>
-        <p>© 2024 PropToken. Fractional Real Estate NFT Platform.</p>
+        <p>© 2024 Fractional Real Estate NFT RWA Tokenization.</p>
       </footer>
     </div>
   );
