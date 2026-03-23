@@ -13,7 +13,8 @@ hardhat2/
 │   └── MockUSDT.sol
 ├── ignition/           # Hardhat Ignition deployment modules
 │   └── modules/
-│       └── BaseErc721PropertyNFT.ts
+│       ├── BaseErc721PropertyNFT.ts
+│       └── MockUSDT.ts
 ├── test/               # JavaScript test files
 │   └── BaseErc721PropertyNFT.test.js
 ├── .env.example        # Environment variables template
@@ -215,15 +216,47 @@ npx hardhat test --gas-reporter
 
 ## 🚢 Deployment Workflow
 
-### 1. Deploy with Hardhat Ignition
+### Important: Deployment Order
 
-#### BaseErc721PropertyNFT Deployment
+The contracts must be deployed in the correct order:
+
+1. **First**: Deploy MockUSDT token
+2. **Second**: Update BaseErc721PropertyNFT module with the deployed USDT address
+3. **Third**: Deploy BaseErc721PropertyNFT
+
+### 1. Deploy MockUSDT Token
 
 ```bash
-# Deploy with default parameters
-npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --network sepolia
+# Deploy MockUSDT to your network
+npx hardhat ignition:deploy ./ignition/modules/MockUSDT.ts --network sepolia
 
-# Deployment parameters are defined in the ignition module
+# Note the deployed USDT contract address from the output
+```
+
+### 2. Update BaseErc721PropertyNFT Module
+
+Edit `./ignition/modules/BaseErc721PropertyNFT.ts` and update the `usdtToken` parameter on line 10 to use your deployed USDT address:
+
+```typescript
+const usdtToken = m.getParameter("usdtToken", "0xYOUR_DEPLOYED_USDT_ADDRESS_HERE");
+```
+
+Alternatively, you can pass it as an environment variable or deployment parameter.
+
+### 3. Deploy BaseErc721PropertyNFT
+
+```bash
+# Deploy with the updated module
+npx hardhat ignition:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --network sepolia
+```
+
+### Deploy with Custom Parameters
+
+You can customize deployment parameters:
+
+```bash
+# Set parameters via environment variables
+USDT_TOKEN=0x... npx hardhat ignite:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --network sepolia
 ```
 
 ## 🐛 Troubleshooting
