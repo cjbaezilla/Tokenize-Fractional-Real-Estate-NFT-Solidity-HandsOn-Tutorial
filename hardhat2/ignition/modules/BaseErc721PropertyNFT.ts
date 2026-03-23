@@ -2,12 +2,12 @@ import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const BaseErc721PropertyNFTModule = buildModule("BaseErc721PropertyNFTModule", (m) => {
   // Deployment parameters with defaults
-  const initialOwner = m.getParameter("initialOwner", m.env().get("DEPLOYER_ADDRESS") || "0x0000000000000000000000000000000000000000");
+  const initialOwner = m.getParameter("initialOwner", "0xaEeaA55ED4f7df9E4C5688011cEd1E2A1b696772");
   const name = m.getParameter("name", "PropertyNFT");
   const ticker = m.getParameter("ticker", "PROP");
   const maxSupply = m.getParameter("maxSupply", 1000n);
   const mintPrice = m.getParameter("mintPrice", 1000000n); // 1 USDT (6 decimals)
-  const usdtToken = m.getParameter("usdtToken", "0x0000000000000000000000000000000000000000");
+  const usdtToken = m.getParameter("usdtToken", "0x18648D890d389438a12962965E5c47d9C667B20c");
 
   // Property metadata parameters
   const propertyAddress = m.getParameter("propertyAddress", "123 Main St, City, Country");
@@ -30,20 +30,16 @@ const BaseErc721PropertyNFTModule = buildModule("BaseErc721PropertyNFTModule", (
   ]);
 
   // Update property metadata after deployment
-  m.runAfter(async (contracts, { ethers }) => {
-    const contract = contracts.baseErc721PropertyNFT as any;
-    const tx = await contract.updatePropertyMetadata(
-      propertyAddress,
-      propertyValue,
-      propertyType,
-      propertyRooms,
-      propertyBaths,
-      description,
-      imageData,
-      externalUrl
-    );
-    await tx.wait();
-  });
+  m.call(baseErc721PropertyNFT, "updatePropertyMetadata", [
+    propertyAddress,
+    propertyValue,
+    propertyType,
+    propertyRooms,
+    propertyBaths,
+    description,
+    imageData,
+    externalUrl
+  ]);
 
   return { baseErc721PropertyNFT };
 });

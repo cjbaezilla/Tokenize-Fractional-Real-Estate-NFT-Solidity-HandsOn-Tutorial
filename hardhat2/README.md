@@ -259,6 +259,27 @@ You can customize deployment parameters:
 USDT_TOKEN=0x... npx hardhat ignite:deploy ./ignition/modules/BaseErc721PropertyNFT.ts --network sepolia
 ```
 
+## 🎯 Deployed Contracts
+
+### MockUSDT (Sepolia Testnet)
+
+- **Contract Address**: [`0x18648D890d389438a12962965E5c47d9C667B20c`](https://sepolia.etherscan.io/address/0x18648D890d389438a12962965E5c47d9C667B20c)
+- **Deployment Transaction**: https://sepolia.etherscan.io/tx/0x289141957dba7c8e870dbac42b502b7b2653955476101038d34a6111364a4ded
+- **Deployer**: 0xaEeaA55ED4f7df9E4C5688011cEd1E2A1b696772
+- **Initial Supply**: 1,000,000 USDT (6 decimals)
+
+### BaseErc721PropertyNFT (Sepolia Testnet)
+
+- **Contract Address**: [`0x7b188E5B41BDba8bE2057d66F77c34b7279b2A1e`](https://sepolia.etherscan.io/address/0x7b188E5B41BDba8bE2057d66F77c34b7279b2A1e)
+- **Deployment Transaction**: https://sepolia.etherscan.io/tx/0x0c04a1eb6caa0efc025b2988a50d052c702427be1862308b01337e2a68b9e9bb
+- **Deployer**: 0xaEeaA55ED4f7df9E4C5688011cEd1E2A1b696772
+- **Parameters**:
+  - Name: PropertyNFT
+  - Ticker: PROP
+  - Max Supply: 1000
+  - Mint Price: 1 USDT (1000000 with 6 decimals)
+  - USDT Token: 0x18648D890d389438a12962965E5c47d9C667B20c
+
 ## 🐛 Troubleshooting
 
 ### Compilation Errors
