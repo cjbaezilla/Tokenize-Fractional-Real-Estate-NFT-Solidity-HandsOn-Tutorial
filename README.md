@@ -4,6 +4,22 @@
 
 A decentralized application (dApp) for tokenizing real estate properties into fractional ownership using Solidity smart contracts and non-fungible tokens (NFTs). Built with Hardhat and following industry best practices.
 
+## 📦 Project Structure
+
+The project is organized into two main components:
+
+- **`hardhat2/`** - Smart contracts and blockchain development environment
+  - Solidity contracts for property NFT and USDT payments
+  - Hardhat configuration, compilation, and testing setup
+  - Deployment modules and scripts
+  - Development dependencies and tools
+
+- **`nextjs/`** - Front-end user interface built with Next.js and React
+  - Web application for interacting with the smart contracts
+  - React components for property display, minting, and management
+  - TypeScript configuration for type safety
+  - Modern frontend build and development setup
+
 ## 📋 Overview
 
 This project implements a system where real estate properties are represented as NFTs (ERC721) that can be purchased using USDT, which can then be divided into fractional shares (tokens) that represent ownership stakes. This enables:
@@ -115,18 +131,25 @@ npx hardhat verify --network sepolia <contract-address> <constructor-arguments>
 ## 📁 Project Structure
 
 ```
-hardhat2/
-├── contracts/          # Solidity smart contracts
-│   ├── BaseErc721PropertyNFT.sol
-│   └── MockUSDT.sol
-├── ignition/           # Hardhat Ignition deployment modules
-│   └── modules/
-│       └── BaseErc721PropertyNFT.ts
-├── test/               # Test files
-│   └── BaseErc721PropertyNFT.test.js
-├── .env.example        # Environment variables template
-├── hardhat.config.js   # Hardhat configuration
-└── package.json        # Dependencies
+.
+├── hardhat2/            # Smart contracts and Hardhat setup
+│   ├── contracts/          # Solidity smart contracts
+│   │   ├── BaseErc721PropertyNFT.sol
+│   │   └── MockUSDT.sol
+│   ├── ignition/           # Hardhat Ignition deployment modules
+│   │   └── modules/
+│   │       └── BaseErc721PropertyNFT.ts
+│   ├── test/               # Test files
+│   │   └── BaseErc721PropertyNFT.test.js
+│   ├── .env.example        # Environment variables template
+│   ├── hardhat.config.js   # Hardhat configuration
+│   └── package.json        # Dependencies
+└── nextjs/             # Front-end React application (Next.js)
+    ├── src/               # Application source code
+    ├── next.config.js     # Next.js configuration
+    ├── package.json       # Dependencies
+    ├── tsconfig.json      # TypeScript configuration
+    └── README.md          # Frontend documentation
 ```
 
 ## 🔍 Contract Workflow
