@@ -1,24 +1,52 @@
-# Fractional Real Estate NFT
+# Fractional Real Estate NFT - RWA Tokenization Tutorial
 
-> ⚠️ **Educational Purpose Only** - This is a hands-on learning project for tutorial purposes. **Not production-ready.**
+![Cover](./images/screenshot_main.png)
 
-A decentralized application (dApp) for tokenizing real estate properties into fractional ownership using Solidity smart contracts and non-fungible tokens (NFTs). Built with Hardhat and following industry best practices.
+> 🎓 **Educational Purpose** - This is a comprehensive hands-on tutorial for learning **Real World Asset (RWA) fractional tokenization** using NFTs. **Not production-ready.**
 
-## 📦 Project Structure
+A decentralized application (dApp) for tokenizing real estate properties into fractional ownership using Solidity smart contracts and non-fungible tokens (NFTs). This tutorial demonstrates full-stack blockchain development with Hardhat, Next.js, and modern Web3 libraries.
 
-The project is organized into two main components:
+## 📚 Tutorial Components
 
-- **`hardhat2/`** - Smart contracts and blockchain development environment
-  - Solidity contracts for property NFT and USDT payments
-  - Hardhat configuration, compilation, and testing setup
-  - Deployment modules and scripts
-  - Development dependencies and tools
+This repository contains **two integrated tutorial modules** that work together to form a complete dApp:
 
-- **`nextjs/`** - Front-end user interface built with Next.js and React
-  - Web application for interacting with the smart contracts
-  - React components for property display, minting, and management
-  - TypeScript configuration for type safety
-  - Modern frontend build and development setup
+### ⛓️ [hardhat2/](./hardhat2/) - Smart Contract Development (Part 1)
+
+**Comprehensive blockchain tutorial** covering Solidity smart contract development for fractional real estate tokenization.
+
+- **Full Documentation**: [`hardhat2/README.md`](./hardhat2/README.md) (1600+ lines)
+- **Core Contracts**: `BaseErc721PropertyNFT.sol` (ERC721 with USDT payments) + `MockUSDT.sol`
+- **Key Concepts**: ERC721/ERC20 standards, payment processing, metadata management, Hardhat workflow
+- **Testing**: 606+ lines of comprehensive tests across 8 categories
+- **Deployment**: Hardhat Ignition modules for localhost and Sepolia testnet
+- **Tech**: Solidity ^0.8.28, Hardhat ^2.28.6, OpenZeppelin ^5.6.1
+
+**What you'll learn in `hardhat2/`:**
+- Writing secure smart contracts with OpenZeppelin
+- Using Hardhat for compilation, testing, and deployment
+- Implementing ERC721 NFTs with payment integration
+- Testing strategies for blockchain applications
+- Deployment to local and testnet environments
+
+---
+
+### 🖥️ [nextjs/](./nextjs/) - Frontend Development (Part 2)
+
+**Full-stack React tutorial** building a modern web3 frontend to interact with the smart contracts.
+
+- **Full Documentation**: [`nextjs/README.md`](./nextjs/README.md) (1144 lines)
+- **Framework**: Next.js 15 with React 19 and TypeScript
+- **Web3 Stack**: wagmi v2, RainbowKit, viem for Ethereum interactions
+- **Architecture**: Clean layered pattern with custom hooks and contract wrappers
+- **Pages**: Dashboard with wallet connection, minting interface, property details, transaction history
+- **State Management**: TanStack Query for server-state caching
+
+**What you'll learn in `nextjs/`:**
+- Next.js application structure with TypeScript
+- Web3 integration patterns with wagmi and RainbowKit
+- React hooks for blockchain interactions
+- Responsive CSS with modern design
+- Environment configuration for dApps
 
 ## 📋 Overview
 
@@ -128,8 +156,60 @@ Verify deployed contracts on Etherscan:
 npx hardhat verify --network sepolia <contract-address> <constructor-arguments>
 ```
 
-## 📁 Project Structure
+## 📁 Repository Structure
 
+```
+Tokenize-Fractional-Real-Estate-NFT-Solidity-HandsOn-Tutorial/
+├── hardhat2/                    # ⛓️ Smart contract tutorial (Part 1)
+│   ├── contracts/              # Solidity source files
+│   │   ├── BaseErc721PropertyNFT.sol  # Main property NFT contract
+│   │   └── MockUSDT.sol                # Test USDT token
+│   ├── ignition/               # Hardhat Ignition deployment modules
+│   │   └── modules/
+│   │       ├── BaseErc721PropertyNFT.ts
+│   │       └── MockUSDT.ts
+│   ├── test/                   # Comprehensive test suite (606+ lines)
+│   │   └── BaseErc721PropertyNFT.test.js
+│   ├── artifacts/              # Compiled contract outputs (generated)
+│   ├── cache/                  # Hardhat compilation cache (generated)
+│   ├── typechain-types/        # TypeScript bindings (generated)
+│   ├── .env.example            # Environment variables template
+│   ├── hardhat.config.js       # Hardhat configuration
+│   ├── package.json            # Dependencies & npm scripts
+│   └── README.md               # 📘 Detailed blockchain tutorial (1600+ lines)
+│
+├── nextjs/                     # 🖥️ Frontend tutorial (Part 2)
+│   ├── src/
+│   │   ├── pages/              # Next.js Pages Router
+│   │   │   ├── _app.tsx        # Root component with providers
+│   │   │   └── index.tsx       # Main dashboard (499 lines)
+│   │   ├── contracts/          # Smart contract integrations
+│   │   │   ├── propertyNFT.ts  # viem wrapper (35 lines)
+│   │   │   ├── mockUSDT.ts     # viem wrapper (30 lines)
+│   │   │   └── abis/           # Compiled ABIs (JSON)
+│   │   ├── hooks/              # Custom React hooks
+│   │   │   ├── usePropertyNft.ts   # NFT hook (139 lines)
+│   │   │   └── useMockUsdt.ts      # USDT hook (98 lines)
+│   │   ├── styles/             # CSS modules
+│   │   │   ├── globals.css     # Global dark theme (120 lines)
+│   │   │   └── Home.module.css # Component styles (414 lines)
+│   │   └── wagmi.ts            # Web3 configuration (65 lines)
+│   ├── .env.example            # Frontend environment template
+│   ├── next.config.js          # Next.js configuration
+│   ├── package.json            # Dependencies
+│   ├── tsconfig.json           # TypeScript configuration
+│   └── README.md               # 📘 Detailed frontend tutorial (1144 lines)
+│
+├── docs/                       # 📚 Supplementary documentation
+│   ├── CONTRACTS_REFERENCE.md  # Complete API reference (224 lines)
+│   └── BASEERC721PROPERTYNFT_TESTS.md  # Testing guide (300+ lines)
+│
+├── images/                     # 🖼️ Visual documentation (screenshots)
+│
+├── AGENTS.md                   # OpenCode agent reference
+├── opencode.json               # OpenCode configuration
+├── README.md                   # This file - tutorial overview
+└── LICENSE                     # MIT License
 ```
 .
 ├── hardhat2/            # Smart contracts and Hardhat setup
