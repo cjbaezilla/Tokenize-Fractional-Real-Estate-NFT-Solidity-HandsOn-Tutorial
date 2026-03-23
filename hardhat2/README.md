@@ -280,6 +280,10 @@ USDT_TOKEN=0x... npx hardhat ignite:deploy ./ignition/modules/BaseErc721Property
   - Mint Price: 1 USDT (1000000 with 6 decimals)
   - USDT Token: 0x18648D890d389438a12962965E5c47d9C667B20c
 
+## 📸 Demo
+
+![Fractional Real Estate NFT Demo](https://ipfs.io/ipfs/bafybeiceq4fw66eswi34axd6423kqawmurkwjg7haotwmar7r4luzobeem)
+
 ## 🐛 Troubleshooting
 
 ### Compilation Errors

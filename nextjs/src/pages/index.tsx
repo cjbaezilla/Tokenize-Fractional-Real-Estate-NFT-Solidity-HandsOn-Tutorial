@@ -213,12 +213,12 @@ const Home: NextPage = () => {
                        <div className={styles.infoLabel}>Address</div>
                        <div className={styles.infoValue}>{propertyAddress || 'N/A'}</div>
                      </div>
-                    <div className={styles.infoCard}>
-                      <div className={styles.infoLabel}>Property Value</div>
-                       <div className={`${styles.infoValue} ${styles.highlight}`}>
-                          {propertyValue ? `${Number(formatEther(propertyValue))} ETH` : 'N/A'}
-                       </div>
-                    </div>
+                     <div className={styles.infoCard}>
+                       <div className={styles.infoLabel}>Property Value</div>
+                        <div className={`${styles.infoValue} ${styles.highlight}`}>
+                          {propertyValue ? `US$${Number(propertyValue).toLocaleString('en-US')}` : 'N/A'}
+                        </div>
+                     </div>
                     <div className={styles.infoCard}>
                       <div className={styles.infoLabel}>Type</div>
                       <div className={styles.infoValue}>{propertyType || 'N/A'}</div>
