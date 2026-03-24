@@ -1,6 +1,8 @@
 # Building a Fractional Real Estate NFT Platform: A Hands-On Tutorial for Tokenization on Ethereum using Solidity and Next.js
 
-![Cover](./images/screenshot_main.png)
+![Cover](./images/1.jpg)
+
+![Cover 2](./images/screenshot_main.png)
 
 ## Introduction: The Future of Property Investment
 
@@ -50,6 +52,8 @@ A gold bar worth $60,000 is tokenized into 60,000 tokens. Each token represents 
 ### 8. **Carbon Credits**
 Environmental projects generate carbon credits. Tokenizing them makes them accessible to smaller companies wanting to offset emissions, creating a liquid market for sustainability.
 
+![Cover 3](./images/2.jpg)
+
 ## Simple Analogy Recap
 - **Tokenization** = Cutting a pizza into slices so everyone can afford a piece
 - **Fractional Ownership** = Owning a percentage of something rather than the whole
@@ -91,6 +95,8 @@ Think of building this system like opening a restaurant:
 The blockchain layer runs on Ethereum or compatible networks. Smart contracts written in Solidity define the rules for ownership, payment processing, and metadata management. These contracts are deployed to the blockchain where they execute autonomously without any central authority. OpenZeppelin provides battle-tested implementations of standard token contracts that we build upon, ensuring security and compliance with established specifications.
 
 The frontend layer provides the user interface that makes the system accessible. Built with Next.js, it offers server-side rendering, excellent performance, and a great developer experience. Web3 integration happens through wagmi and RainbowKit, which handle wallet connections, blockchain interactions, and state management. viem serves as the low-level Ethereum library that actually communicates with the blockchain network.
+
+![Cover 4](./images/3.jpg)
 
 ## The Smart Contract: Heart of the System
 
@@ -1342,82 +1348,6 @@ The minting function uses `_safeMint`, which protects against accidental token l
 
 The global metadata design means that all tokens share the same property information. If you needed per-token uniqueness, you would redesign the metadata storage. The current design suits fractional ownership of a single property but cannot represent multiple distinct properties in one collection.
 
-## Extending the Project
-
-This tutorial provides a complete working system, but numerous enhancements are possible. You might add a function to withdraw collected USDT from the contract to the owner, implementing a revenue collection mechanism. You could create a mechanism for distributing rental income proportionally to all token holders, requiring calculation of each holder's percentage and iteration through all owners.
-
-Enhancing the metadata to include per-token uniqueness would enable representing multiple properties. This would involve storing property details in a mapping keyed by token ID rather than as global variables. You might also integrate with decentralized storage solutions like IPFS or Arweave for larger image files and detailed property documentation.
-
-The frontend could be expanded with pagination for large collections, filtering and sorting capabilities, and integration with NFT marketplaces like OpenSea via their API. Adding historical price charts, tenant information, and financial statements would make this a full-featured real estate investment platform.
-
-## Additional Use Cases to Implement
-
-With this foundation, you can extend the platform to support:
-
-### Secondary Marketplace
-Allow token holders to resell their shares. Implement a marketplace contract where users list tokens for sale, and others can buy them. The contract automatically transfers ownership and handles payment splitting between seller and the platform.
-
-**Example:** Maria buys 2 tokens at $500 each. Six months later, property value rises to $550/token. She sells 1 token on the marketplace for $550, making $50 profit.
-
-### Staking & Rewards
-Let token holders stake their NFT shares to earn additional rewards. This could come from a portion of rental income or from the platform's treasury.
-
-**Example:** Stake your property tokens to earn 5% APY on top of rental income, incentivizing long-term holding.
-
-### Rental Distribution System
-Automatically distribute rental income to all token holders. The contract would collect rental payments (from the property owner to the contract), then allow token holders to claim their proportional share.
-
-**Example:** Monthly rent $3,000 → Each of 1,000 token holders can claim $3 per token by calling a `claimRental()` function.
-
-### Governance Mechanism
-Give token holders voting rights on property decisions. Major decisions like selling the property, refinancing, or renovations require approval from token holders via on-chain voting.
-
-**Example:** Proposal to sell the building for $600,000 → Token holders vote → If 60% approve, the sale executes automatically.
-
-### Property Financing
-Allow token holders to vote on taking out a mortgage against the property. The borrowed funds could be used for renovations or to buy additional properties, and repayments come from rental income.
-
-### DAO Structure
-Transform the token collection into a Decentralized Autonomous Organization (DAO) where each token represents one governance vote. Token holders collectively manage the property through proposals and voting.
-
-### Fractional Lending
-Use your property tokens as collateral to borrow USDT. The smart contract locks your tokens until you repay the loan, enabling liquidity without selling your investment.
-
-**Example:** Maria needs emergency cash. She locks 2 tokens (worth $1,000) and borrows $600 USDT. She repays over 6 months and gets her tokens back.
-
-### Cross-Property Index Fund
-Create a basket token that represents fractional ownership across multiple properties. Users buy one fund token that automatically diversifies their investment across 10 different properties, reducing risk.
-
-### Migration Between Networks
-Implement a bridge allowing users to move their tokens from Ethereum to Polygon, Arbitrum, or other chains for lower gas fees. Users lock tokens on one chain and receive wrapped tokens on another.
-
-### Real-World Property Management Integration
-Connect the smart contract to real-world property management software. When rent is paid to the management company, they trigger a contract function to distribute funds to token holders, linking physical and digital systems.
-
-## Common Pitfalls to Avoid
-
-When building a production version, watch out for:
-
-1. **Centralization Risk**: If one wallet holds 51% of tokens, they control all votes. Mitigate by limiting maximum token holdings.
-2. **Liquidity Problem**: No buyers when you want to sell. Solution: Incentivize market makers or create a guaranteed buyback pool.
-3. **Regulatory Uncertainty**: Securities laws may apply. Consult legal experts before taking real investments.
-4. **Oracle Problem**: How do you know the property value changed? You need trusted oracles to update off-chain data.
-5. **Gas Costs**: On Ethereum mainnet, every transaction costs $10-100. Consider layer-2 solutions like Polygon or Arbitrum.
-6. **No rental enforcement**: The contract can't force tenants to pay rent. You still need real-world legal systems.
-7. **Metadata permanence**: If your image URL goes down, the NFT appears broken. Store on IPFS or Arweave for permanence.
-
-## Conclusion: Your Journey Begins
-
-This tutorial has walked you through a complete decentralized application for fractional real estate tokenization. You have seen how smart contracts define the rules of ownership and payment, how tests ensure correctness, and how a modern web application makes blockchain functionality accessible to ordinary users.
-
-The concepts covered here extend beyond this specific project. The patterns of ERC721 and ERC20 integration, two-step approvals, custom hooks for blockchain interactions, and comprehensive testing apply to countless other Web3 applications. Understanding this codebase gives you a solid foundation for building your own tokenization projects, whether for real estate, art, intellectual property, or any other asset class.
-
-Remember that blockchain development requires both technical precision and thoughtful security design. Always test thoroughly on testnets before considering any mainnet deployment. Consider professional audits for production systems handling real value. The tools and patterns you've learned here will serve you well as you continue exploring the intersection of finance and technology.
-
-The code is ready to run, modify, and extend. Experiment with changing the property details. Adjust the mint price. Add new features. The best way to learn is by building. Good luck on your journey into decentralized real estate tokenization.
-
----
-
 ## Quick Reference Glossary
 
 **Tokenization**: Converting a physical asset (like a building) into digital tokens that represent ownership shares.
@@ -1449,3 +1379,13 @@ The code is ready to run, modify, and extend. Experiment with changing the prope
 **Wagmi/RainbowKit**: Tools that help websites connect to users' crypto wallets.
 
 **Decimals**: The number of decimal places a token uses (USDT uses 6, ETH uses 18).
+
+## Conclusion: Your Journey Begins
+
+This tutorial has walked you through a complete decentralized application for fractional real estate tokenization. You have seen how smart contracts define the rules of ownership and payment, how tests ensure correctness, and how a modern web application makes blockchain functionality accessible to ordinary users.
+
+The concepts covered here extend beyond this specific project. The patterns of ERC721 and ERC20 integration, two-step approvals, custom hooks for blockchain interactions, and comprehensive testing apply to countless other Web3 applications. Understanding this codebase gives you a solid foundation for building your own tokenization projects, whether for real estate, art, intellectual property, or any other asset class.
+
+Remember that blockchain development requires both technical precision and thoughtful security design. Always test thoroughly on testnets before considering any mainnet deployment. Consider professional audits for production systems handling real value. The tools and patterns you've learned here will serve you well as you continue exploring the intersection of finance and technology.
+
+The code is ready to run, modify, and extend. Experiment with changing the property details. Adjust the mint price. Add new features. The best way to learn is by building. Good luck on your journey into decentralized real estate tokenization.
