@@ -8,6 +8,14 @@
 
 A decentralized application (dApp) for tokenizing real estate properties into fractional ownership using Solidity smart contracts and non-fungible tokens (NFTs). This tutorial demonstrates full-stack blockchain development with Hardhat, Next.js, and modern Web3 libraries.
 
+## 📚 Read More
+
+1. 📢 **LinkedIn announcement**: https://www.linkedin.com/posts/carlos-baeza-negroni_realestatetokenization-blockchain-solidity-activity-7442228854833741825-Z5T9
+2. 📖 **Read the article directly on LinkedIn**: https://www.linkedin.com/pulse/building-fractional-real-estate-nft-platform-hands-on-baeza-negroni-9xrje
+3. 🐦 **X/Twitter Announcement**: https://x.com/cjbaezilla/status/2036468867954847827
+4. 🔍 **Browse the source**:
+   [article.md](./article.md)
+
 ## 📚 Tutorial Components
 
 This repository contains **two integrated tutorial modules** that work together to form a complete dApp:
