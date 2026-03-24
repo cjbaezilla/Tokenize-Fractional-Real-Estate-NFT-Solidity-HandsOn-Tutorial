@@ -4,6 +4,8 @@
 
 ![Cover 2](./images/screenshot_main.png)
 
+- Project Repository: https://github.com/cjbaezilla/Tokenize-Fractional-Real-Estate-NFT-Solidity-HandsOn-Tutorial
+
 ## Introduction: The Future of Property Investment
 
 Imagine a world where you could own a piece of a luxury apartment building without needing to save hundreds of thousands of dollars. Picture being able to buy and sell your share of real estate as easily as trading digital collectibles. This vision is becoming reality through the powerful combination of blockchain technology and non-fungible tokens. In this comprehensive tutorial, we will explore how to build a complete decentralized application that tokenizes real estate into fractional ownership shares.

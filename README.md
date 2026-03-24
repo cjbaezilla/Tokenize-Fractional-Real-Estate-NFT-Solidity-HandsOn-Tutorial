@@ -1,6 +1,8 @@
 # Fractional Real Estate NFT - RWA Tokenization Tutorial
 
-![Cover](./images/screenshot_main.png)
+![Cover](./images/1.jpg)
+
+![Cover2 ](./images/screenshot_main.png)
 
 > 🎓 **Educational Purpose** - This is a comprehensive hands-on tutorial for learning **Real World Asset (RWA) fractional tokenization** using NFTs. **Not production-ready.**
 
